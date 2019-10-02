@@ -12,7 +12,6 @@ writing, software distributed under the License is distributed on an
 express or implied.
 '''
 
-
 import requests
 
 
@@ -33,7 +32,7 @@ def get_access_token(host: str, port: str, user: str, passwd: str, headers: {}) 
     auth_headers = {**headers, 'Authorization': 'Bearer '}
     try:
         response = requests.post("https://{}:{}/api/fdm/latest/fdm/token".format(host, port),
-                             data=payload, verify=False, headers=auth_headers)
+                                 data=payload, verify=False, headers=auth_headers)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
             print("Login successful, access_token obtained")

@@ -69,6 +69,6 @@ def get_deployment_status(host: str, port: str, headers: {}, id: str):
     if response.status_code != 200:
         print("Failed GET deploy response {}".format(response.status_code))
     else:
-        state =  response.json().get('state')
+        state = response.json().get('state')
         print("GET Deployment state: {}".format(state))
     return state

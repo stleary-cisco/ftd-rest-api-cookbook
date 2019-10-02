@@ -26,7 +26,7 @@ def main():
     access_token = get_access_token(host, port, user, passwd, headers)
     if not access_token:
         return
-    request_headers = {**headers, "Authorization" : "Bearer {}".format(access_token)}
+    request_headers = {**headers, "Authorization": "Bearer {}".format(access_token)}
     if get_pending_changes(host=host, port=port, headers=request_headers):
         id = post_deployment(host=host, port=port, headers=request_headers)
         if not id:
