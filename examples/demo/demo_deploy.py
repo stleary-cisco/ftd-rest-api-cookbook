@@ -23,6 +23,9 @@ from resources.access_token import get_access_token
 
 
 def main():
+    """
+    End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
+    """
     access_token = get_access_token(host, port, user, passwd, headers)
     if not access_token:
         return
