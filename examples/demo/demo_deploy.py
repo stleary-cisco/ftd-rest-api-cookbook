@@ -1,8 +1,3 @@
-import time
-from demo.connection_constants import host, port, user, passwd, headers
-from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
-from resources.access_token import get_access_token
-
 '''
 Copyright (c) 2019 Cisco and/or its affiliates.
 
@@ -20,6 +15,12 @@ writing, software distributed under the License is distributed on an
 express or implied.
 
 '''
+
+import time
+from demo.connection_constants import host, port, user, passwd, headers
+from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
+from resources.access_token import get_access_token
+
 
 def main():
     access_token = get_access_token(host, port, user, passwd, headers)
