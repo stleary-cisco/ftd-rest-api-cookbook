@@ -1,8 +1,8 @@
 # Replace these values with your FTD host information
-host = '10.89.21.72'
-port = '3140'
+host = 'ftd.example'
+port = '443'
 user = 'admin'
-passwd = 'Sourcefire'
+passwd = 'Admin123'
 
 headers = {
     "Content-Type": "application/json",
