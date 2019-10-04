@@ -16,7 +16,7 @@ import time
 import requests
 
 
-def get_pending_changes(host: str, port: str, headers: {}) -> bool:
+def get_pending_changes(host, port, headers):
     """
     Sends a GET rquest to obtain the pending changes from the FTD device
     :param host: ftd host address
@@ -34,7 +34,7 @@ def get_pending_changes(host: str, port: str, headers: {}) -> bool:
     return changes_found
 
 
-def post_deployment(host: str, port: str, headers: {}) -> str:
+def post_deployment(host, port, headers):
     """
     Send a deployment POST request
     :param host: ftd host address
@@ -43,29 +43,30 @@ def post_deployment(host: str, port: str, headers: {}) -> str:
     :return: unique id for the deployment task
     """
     deploy_url = 'api/fdm/latest/operational/deploy'
-    id = None
+    deploy_id = None
     response = requests.post('https://{host}:{port}/{url}'.format(host=host, port=port, url=deploy_url), verify=False,
                              headers=headers)
     if response.status_code != 200:
         print("Failed POST deploy response {}".format(response.status_code))
     else:
         print("POST deployment successful")
-        id = response.json().get('id')
-    return id
+        deploy_id = response.json().get('id')
+    return deploy_id
 
 
-def get_deployment_status(host: str, port: str, headers: {}, id: str):
+def get_deployment_status(host, port, headers, deploy_id):
     """
     Wait for a deployment to complete
     :param host: ftd host address
     :param port: ftd port
     :param headers: HTTP request headers
-    :param id: unique identifier for deployment task
+    :param deploy_id: unique identifier for deployment task
     """
     deploy_url = 'api/fdm/latest/operational/deploy'
     state = None
-    response = requests.get('https://{host}:{port}/{url}/{id}'.format(host=host, port=port, url=deploy_url, id=id),
-                            verify=False, headers=headers)
+    response = requests.get(
+        'https://{host}:{port}/{url}/{deploy_id}'.format(host=host, port=port, url=deploy_url, deploy_id=deploy_id),
+        verify=False, headers=headers)
     if response.status_code != 200:
         print("Failed GET deploy response {}".format(response.status_code))
     else:

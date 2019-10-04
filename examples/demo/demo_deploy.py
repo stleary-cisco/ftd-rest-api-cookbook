@@ -25,22 +25,43 @@ from resources.access_token import get_access_token
 def main():
     """
     End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
+    Requires Python v3.0 or greater and the reqeusts library.
+    You must update the values in connection_constants.py in order to connect to your device.
+    A deployment will be performed only if the user has made changes on the FTD device and those changes
+    are pending at run-time.
+    Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
+    on the FTD device are the most common sources of error.
     """
     access_token = get_access_token(host, port, user, passwd, headers)
     if not access_token:
+        print("Unable to obtain an access token. Did you remember to update connection_constants.py?")
         return
     request_headers = {**headers, "Authorization": "Bearer {}".format(access_token)}
     if get_pending_changes(host=host, port=port, headers=request_headers):
-        id = post_deployment(host=host, port=port, headers=request_headers)
-        if not id:
+        deploy_id = post_deployment(host=host, port=port, headers=request_headers)
+        if not deploy_id:
+            # should never happen
+            print('Unable to obtain a deployment id')
             return
+        # wait for a reasonable period of time (about 20 minutes) for the deployment to complete
         for _ in range(80):
-            state = get_deployment_status(host=host, port=port, headers=request_headers, id=id)
-            if not state or state == 'DEPLOYED' or state == 'FAILED':
+            state = get_deployment_status(host=host, port=port, headers=request_headers, deploy_id=deploy_id)
+            if not state:
+                # should never happen
+                print('Unable to obtain the deployment state')
+                return
+            elif state == 'DEPLOYED':
+                print('Completed deployment successfully')
+                return
+            elif state == 'FAILED':
+                # should never happen
+                print('Deployment failed')
                 return
             print("sleep 15 seconds")
             time.sleep(15)
         print('Unable to complete the deployment')
+    else:
+        print("There was nothing to deploy. Did you remember to make a pending change on the FTD device?")
 
 
 if __name__ == '__main__':

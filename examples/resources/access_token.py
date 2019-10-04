@@ -15,7 +15,7 @@ express or implied.
 import requests
 
 
-def get_access_token(host: str, port: str, user: str, passwd: str, headers: {}) -> str:
+def get_access_token(host, port, user, passwd, headers):
     """
     Login to FTD device and obtain an access token. The access token is required so that the user can
     connect to the device to send REST API requests.
