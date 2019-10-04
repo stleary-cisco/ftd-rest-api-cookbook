@@ -15,9 +15,9 @@ express or implied.
 import time
 import requests
 
-
 def get_pending_changes(host, port, headers):
     """
+    Requires Python v3.0 or greater and requests lib.
     Sends a GET rquest to obtain the pending changes from the FTD device
     :param host: ftd host address
     :param port: ftd port
@@ -36,6 +36,7 @@ def get_pending_changes(host, port, headers):
 
 def post_deployment(host, port, headers):
     """
+    Requires Python v3.0 or greater and requests lib.
     Send a deployment POST request
     :param host: ftd host address
     :param port: ftd port
@@ -56,6 +57,7 @@ def post_deployment(host, port, headers):
 
 def get_deployment_status(host, port, headers, deploy_id):
     """
+    Requires Python v3.0 or greater and requests lib.
     Wait for a deployment to complete
     :param host: ftd host address
     :param port: ftd port
