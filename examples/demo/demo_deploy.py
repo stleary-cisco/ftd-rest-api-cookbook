@@ -17,10 +17,8 @@ express or implied.
 '''
 
 import time
-from demo.connection_constants import host, port, user, passwd, headers
 from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
 from resources.access_token import get_access_token
-
 
 def main():
     """
@@ -32,6 +30,10 @@ def main():
     Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
     on the FTD device are the most common sources of error.
     """
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
     host = 'ftd.example'
     port = '443'
     user = 'admin'
