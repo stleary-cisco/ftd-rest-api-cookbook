@@ -35,7 +35,9 @@ def get_access_token(host, port, user, passwd):
                                  data=payload, verify=False, headers=auth_headers)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
-            print("Login successful, access_token obtained")
+            print("Login successful, access_token obtained {}".format(access_token))
+        else:
+            print("Login failed {} {}".format(response.status_code, response.json()))
     except Exception as e:
-        print("Unable to POST access token request: {}".format(str(e)))
+        print("Exception in POST access token request: {}".format(str(e)))
     return access_token

@@ -17,8 +17,9 @@ express or implied.
 '''
 
 import time
-from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
 from resources.access_token import get_access_token
+from resources.troubleshoot import schedule_troubleshoot, get_troubleshoot_job, download_troubleshoot
+
 
 def main():
     """
@@ -38,31 +39,35 @@ def main():
     if not access_token:
         print("Unable to obtain an access token. Did you remember to update connection_constants.py?")
         return
-    if get_pending_changes(host=host, port=port, access_token=access_token):
-        deploy_id = post_deployment(host=host, port=port, access_token=access_token)
-        if not deploy_id:
+
+    job_id = schedule_troubleshoot(host=host, port=port, access_token=access_token)
+    if not job_id:
+        # should never happen
+        print('Unable to obtain a job id')
+        return
+    # filename = "58ef607a-d661-11e9-8331-a5775175f3ad-troubleshoot.tar.gz"
+    # wait for a reasonable period of time (about 20 minutes) for the job to complete
+    status = None
+    filename = None
+    for _ in range(80):
+        (status, filename) = get_troubleshoot_job(host=host, port=port, access_token=access_token, job_id=job_id)
+        if not status:
             # should never happen
-            print('Unable to obtain a deployment id')
+            print('Unable to obtain the troubleshoot job status')
             return
-        # wait for a reasonable period of time (about 20 minutes) for the deployment to complete
-        for _ in range(80):
-            state = get_deployment_status(host=host, port=port, access_token=access_token, deploy_id=deploy_id)
-            if not state:
-                # should never happen
-                print('Unable to obtain the deployment state')
-                return
-            elif state == 'DEPLOYED':
-                print('Completed deployment successfully')
-                return
-            elif state == 'FAILED':
-                # should never happen
-                print('Deployment failed')
-                return
-            print("sleep 15 seconds")
-            time.sleep(15)
-        print('Unable to complete the deployment')
+        elif status == 'SUCCESS':
+            print('Completed troubleshoot job successfully {}'.format(filename))
+            break
+        elif status == 'FAILED':
+            # should never happen
+            print('Troubleshoot job failed')
+            return
+        print("sleep 15 seconds")
+        time.sleep(15)
     else:
-        print("There was nothing to deploy. Did you remember to make a pending change on the FTD device?")
+        print('Unable to complete the troubleshoot')
+        return
+    download_troubleshoot(host=host, port=port, access_token=access_token, filename=filename)
 
 
 if __name__ == '__main__':
