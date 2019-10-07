@@ -18,7 +18,7 @@ express or implied.
 
 import time
 from resources.access_token import get_access_token
-from resources.troubleshoot import schedule_troubleshoot, get_troubleshoot_job, download_troubleshoot
+from resources.high_availability import get_ha_status, post_break_ha, get_break_ha
 
 
 def main():
@@ -32,42 +32,56 @@ def main():
     on the FTD device are the most common sources of error.
     """
     host = '10.89.21.72'
-    port = '3139'
+    port = '3241'
     user = 'admin'
-    passwd = 'Admin123$'
+    passwd = 'Sourcefire'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
 
-    job_id = schedule_troubleshoot(host=host, port=port, access_token=access_token)
-    if not job_id:
+    (node_state, peer_node_state, config_status) = get_ha_status(host=host, port=port, access_token=access_token)
+    if not node_state or not peer_node_state or not config_status:
         # should never happen
-        print('Unable to obtain a job id')
+        print('Unable to obtain ha status')
         return
-    # filename = "58ef607a-d661-11e9-8331-a5775175f3ad-troubleshoot.tar.gz"
-    # wait for a reasonable period of time (about 20 minutes) for the job to complete
-    status = None
-    filename = None
+    if node_state == 'HA_CONFIGURATION_SYNC' or peer_node_state == 'HA_CONFIGURATION_SYNC' or \
+                    config_status == 'PRIMARY_IMPORTING_CONFIG' or config_status == 'SECONDARY_IMPORTING_CONFIG':
+        print('Invalid ha status for break: node {} peer {} configStatus {}'.format(node_state, peer_node_state,
+                                                                                    config_status))
+        return
+    break_ha_id = post_break_ha(host=host, port=port, access_token=access_token, clearIntfs=True)
+    if not break_ha_id:
+        print('Unable to obtain break id')
+        return
     for _ in range(80):
-        (status, filename) = get_troubleshoot_job(host=host, port=port, access_token=access_token, job_id=job_id)
-        if not status:
-            # should never happen
-            print('Unable to obtain the troubleshoot job status')
-            return
-        elif status == 'SUCCESS':
-            print('Completed troubleshoot job successfully {}'.format(filename))
+        state = get_break_ha(host=host, port=port, access_token=access_token, break_ha_id=break_ha_id)
+        if state == 'DEPLOYED':
             break
-        elif status == 'FAILED':
+        elif state == 'FAILED':
+            print('Unable to complete break deployment')
+            return
+        else:
+            print("sleep 15 seconds")
+            time.sleep(15)
+    else:
+        print('Unable to complete break')
+        return
+
+    for _ in range(80):
+        (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
+        if not node_state:
             # should never happen
-            print('Troubleshoot job failed')
+            print('Unable to obtain ha status')
+            return
+        if node_state == 'SINGLE_NODE':
+            print("HA break completed successfully")
             return
         print("sleep 15 seconds")
         time.sleep(15)
     else:
-        print('Unable to complete the troubleshoot')
+        print('Unable to complete break')
         return
-    download_troubleshoot(host=host, port=port, access_token=access_token, filename=filename)
 
 
 if __name__ == '__main__':

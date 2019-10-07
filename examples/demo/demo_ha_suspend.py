@@ -17,8 +17,9 @@ express or implied.
 '''
 
 import time
-from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
 from resources.access_token import get_access_token
+from resources.high_availability import get_ha_status, suspend_HA
+
 
 def main():
     """
@@ -31,38 +32,31 @@ def main():
     on the FTD device are the most common sources of error.
     """
     host = '10.89.21.72'
-    port = '3139'
+    port = '3241'
     user = 'admin'
-    passwd = 'Admin123$'
+    passwd = 'Sourcefire'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
-    if get_pending_changes(host=host, port=port, access_token=access_token):
-        deploy_id = post_deployment(host=host, port=port, access_token=access_token)
-        if not deploy_id:
+    result = suspend_HA(host, port, access_token)
+    if not result:
+        print('Unable to suspend device')
+        return
+    for _ in range(80):
+        (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
+        if not node_state:
             # should never happen
-            print('Unable to obtain a deployment id')
+            print('Unable to obtain ha status')
             return
-        # wait for a reasonable period of time (about 20 minutes) for the deployment to complete
-        for _ in range(80):
-            state = get_deployment_status(host=host, port=port, access_token=access_token, deploy_id=deploy_id)
-            if not state:
-                # should never happen
-                print('Unable to obtain the deployment state')
-                return
-            elif state == 'DEPLOYED':
-                print('Completed deployment successfully')
-                return
-            elif state == 'FAILED':
-                # should never happen
-                print('Deployment failed')
-                return
-            print("sleep 15 seconds")
-            time.sleep(15)
-        print('Unable to complete the deployment')
+        if node_state == 'HA_SUSPENDED_NODE':
+            print("FTD device suspended successfully")
+            return
+        print("sleep 15 seconds")
+        time.sleep(15)
     else:
-        print("There was nothing to deploy. Did you remember to make a pending change on the FTD device?")
+        print('Never reached suspended state')
+        return
 
 
 if __name__ == '__main__':
