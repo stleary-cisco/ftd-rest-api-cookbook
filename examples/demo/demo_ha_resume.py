@@ -25,16 +25,16 @@ def main():
     """
     End to end example of code that performs an HA resume and waits for the device to rejoin the HA pair.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values in connection_constants.py in order to connect to your device.
+    You must update the values for host, port, user, and password to connect to your device.
     A deployment will be performed only if the user has made changes on the FTD device and those changes
     are pending at run-time.
     Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
     on the FTD device are the most common sources of error.
     """
-    host = '10.89.21.72'
-    port = '3241'
+    host = 'ftd.example'
+    port = '443'
     user = 'admin'
-    passwd = 'Sourcefire'
+    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")

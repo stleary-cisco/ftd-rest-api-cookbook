@@ -18,7 +18,7 @@ import requests
 def get_pending_changes(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a GET rquest to obtain the pending changes from the FTD device
+    Send a pending changes GET request to determine if there are changes to be deployed.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -42,7 +42,7 @@ def get_pending_changes(host, port, access_token):
 def post_deployment(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send a deployment POST request
+    Send a deployment POST request to start the deployment task.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -68,7 +68,7 @@ def post_deployment(host, port, access_token):
 def get_deployment_status(host, port, access_token, deploy_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Wait for a deployment to complete
+    Send a deployment GET request to determine if the deployment task has completed.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access

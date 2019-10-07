@@ -18,7 +18,7 @@ import requests
 def schedule_troubleshoot(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a POST rquest to schedule a troubleshoot job on the FTD device
+    Send a schedule troubleshoot POST request to an FTD device
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -45,7 +45,7 @@ def schedule_troubleshoot(host, port, access_token):
 def get_troubleshoot_job(host, port, access_token, job_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Get the status of a job executing on the FTD device
+    Send a troubleshoot job GET request to determine the status of a troubleshoot task.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -74,7 +74,9 @@ def get_troubleshoot_job(host, port, access_token, job_id):
 def download_troubleshoot(host, port, access_token, filename):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a POST rquest to schedule a troubleshoot job on the FTD device
+    Send a download troubleshoot POST request to obtain a troubleshoot file.
+    The downloaded troubleshoot filename will consist of the troubleshoot job id followed
+    by '-troubleshoot.tar.gz'.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access

@@ -18,7 +18,7 @@ import requests
 def get_ha_status(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a GET HA status to an FTD device.
+    Send an HA status GET request to a device in an HA pair.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -49,7 +49,7 @@ def get_ha_status(host, port, access_token):
 def suspend_HA(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a POST request to suspend an FTD device in an HA pair.
+    Send an HA suspend POST request a device in an HA pair.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -73,7 +73,7 @@ def suspend_HA(host, port, access_token):
 def resume_HA(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a POST request to schedule a troubleshoot job on the FTD device.
+    Send an HA resume POST request to a device in an HA pair.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -97,7 +97,7 @@ def resume_HA(host, port, access_token):
 def post_break_ha(host, port, access_token, clearIntfs=False):
     """
     Requires Python v3.0 or greater and requests lib.
-    Sends a POST break HA request to an FTD device.
+    Send an HA break POST request to a device in an HA pair.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -128,7 +128,7 @@ def post_break_ha(host, port, access_token, clearIntfs=False):
 def get_break_ha(host, port, access_token, break_ha_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Get the HA break status of an FTD device
+    Send an HA break status request to a device in an HA pair.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
