@@ -38,10 +38,10 @@ To run the scripts:
 
 You will need to edit the demo*py files and set the correct host, port, and password values:
 ````
-    host = '10.89.21.72'
-    port = '3139'
+    host = 'ftd.example'
+    port = '443'
     user = 'admin'
-    passwd = 'Admin123$'
+    passwd = 'Admin123'
 ````
 
 
