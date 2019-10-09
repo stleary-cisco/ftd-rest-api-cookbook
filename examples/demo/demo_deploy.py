@@ -30,10 +30,10 @@ def main():
     Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
     on the FTD device are the most common sources of error.
     """
-    host = '10.89.21.72'
-    port = '3139'
+    host = 'ftd.example'
+    port = '443'
     user = 'admin'
-    passwd = 'Admin123$'
+    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
