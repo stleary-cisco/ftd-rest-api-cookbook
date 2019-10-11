@@ -26,10 +26,6 @@ def main():
     End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
-    A deployment will be performed only if the user has made changes on the FTD device and those changes
-    are pending at run-time.
-    Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
-    on the FTD device are the most common sources of error.
     """
     host = 'ftd.example'
     port = '443'
@@ -66,8 +62,10 @@ def main():
     else:
         print('Unable to complete the troubleshoot')
         return
-    download_troubleshoot(host=host, port=port, access_token=access_token, filename=filename)
-
+    try:
+        download_troubleshoot(host=host, port=port, access_token=access_token, filename=filename)
+    except Exception as e:
+        print('Error when downloading troubleshoot file {}'.format(str(e)))
 
 if __name__ == '__main__':
     main()

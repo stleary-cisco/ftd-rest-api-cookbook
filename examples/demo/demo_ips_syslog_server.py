@@ -18,12 +18,13 @@ express or implied.
 
 import time
 from resources.access_token import get_access_token
-from resources.high_availability import get_ha_status, resume_HA
+from resources.ips import get_intrusion_settings, update_intrusion_settings
+from resources.syslog_server import post_syslog_server
 
 
 def main():
     """
-    End to end example of code that performs an HA resume and waits for the device to rejoin the HA pair.
+    End to end example of code that assigns an intrusion rule syslog server.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
@@ -35,22 +36,22 @@ def main():
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
-    result = resume_HA(host, port, access_token)
-    if not result:
-        print('Unable to suspend device')
+    syslog_server = {
+        "host": "192.168.100.1",
+        "useManagementInterface": True,
+        "port": "514",
+        "protocol": "UDP",
+        "type": "syslogserver"
+    }
+    syslog_server = post_syslog_server(host, port, access_token, syslog_server)
+    if not syslog_server:
+        print('Unable to post syslog server')
         return
-    for _ in range(80):
-        (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
-        if not node_state:
-            # This is expected if the FTD device was in standby state before being suspended
-            print('Unable to obtain ha status')
-        elif node_state == 'HA_ACTIVE_NODE' or node_state == 'HA_STANDBY_NODE':
-            print("FTD device resumed successfully")
-            return
-        print("sleep 15 seconds")
-        time.sleep(15)
-    else:
-        print('Unable to restore HA pair')
+    intrusion_settings = get_intrusion_settings(host, port, access_token)
+    intrusion_settings["syslogServer"] =  syslog_server
+    intrusion_settings = update_intrusion_settings(host, port, access_token, intrusion_settings)
+    if not intrusion_settings:
+        print('Unable to update intrusion settings')
         return
 
 
