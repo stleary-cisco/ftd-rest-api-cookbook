@@ -24,7 +24,11 @@ def main():
     """
     End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+    You must update the values in host, port, user, and passwd in order to connect to your device.
+    A deployment will be performed only if the user has made changes on the FTD device and those changes
+    are pending at run-time.
+    Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
+    on the FTD device are the most common sources of error.
     """
     host = 'ftd.example'
     port = '443'
@@ -32,17 +36,17 @@ def main():
     passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
+        print("Unable to obtain an access token. Did you remember to update connection_constants.py?")
         return
-    if get_pending_changes(host=host, port=port, access_token=access_token):
-        deploy_id = post_deployment(host=host, port=port, access_token=access_token)
+    if get_pending_changes(host, port, access_token):
+        deploy_id = post_deployment(host, port, access_token)
         if not deploy_id:
             # should never happen
             print('Unable to obtain a deployment id')
             return
         # wait for a reasonable period of time (about 20 minutes) for the deployment to complete
         for _ in range(80):
-            state = get_deployment_status(host=host, port=port, access_token=access_token, deploy_id=deploy_id)
+            state = get_deployment_status(host, port, access_token, deploy_id)
             if not state:
                 # should never happen
                 print('Unable to obtain the deployment state')
