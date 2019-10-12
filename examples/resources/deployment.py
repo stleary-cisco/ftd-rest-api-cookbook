@@ -15,71 +15,100 @@ express or implied.
 import requests
 
 
+def get_access_token(host, port, user, passwd):
+    """
+    Requires Python v3.0 or greater and requests lib.
+    Login to FTD device and obtain an access token. The access token is required so that the user can
+    connect to the device to send REST API requests.
+    :param host: ftd host address
+    :param port: ftd port
+    :param user: login user name
+    :param passwd: login password
+    :return: OAUTH access token
+    """
+    access_token = None
+    requests.packages.urllib3.disable_warnings()
+    payload = '{{"grant_type": "password", "username": "{}", "password": "{}"}}'.format(user, passwd)
+    auth_headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    try:
+        response = requests.post("https://{}:{}/api/fdm/latest/fdm/token".format(host, port),
+                                 data=payload, verify=False, headers=auth_headers)
+        if response.status_code == 200:
+            access_token = response.json().get('access_token')
+            print("Login successful, access_token obtained {}".format(access_token))
+        else:
+            print("Login failed {} {}".format(response.status_code, response.json()))
+    except Exception as e:
+        print("Exception in POST access token request: {}".format(str(e)))
+    return access_token
+
+
 def get_pending_changes(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send a pending changes GET request to determine if there are changes to be deployed.
+    Sends a GET rquest to obtain the pending changes from the FTD device
     :param host: ftd host address
     :param port: ftd port
-    :param access_token: OAUTH token for device access
+    :param access_token: OAUTH access token
     :return: True if changes are pending, otherwise False
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
+    changes_found = False
     pending_changes_url = 'api/fdm/latest/operational/pendingchanges'
     response = requests.get('https://{host}:{port}/{url}'.format(host=host, port=port, url=pending_changes_url),
                             verify=False, headers=headers)
     if response.status_code != 200:
         print("Failed GET pending changes response {} {}".format(response.status_code, response.json()))
     else:
-        changes_found = True if response.json().get('items') else False
-        print("GET pending changes found: {}".format(str(changes_found)))
+        print(response.json())
+        if response.json().get('items'):
+            changes_found = True
     return changes_found
 
 
 def post_deployment(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send a deployment POST request to start the deployment task.
+    Send a deployment POST request
     :param host: ftd host address
     :param port: ftd port
-    :param access_token: OAUTH token for device access
+    :param access_token: OAUTH access token
     :return: unique id for the deployment task
     """
     headers = {
-        "Content-Type": "application/json",
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    deploy_url = 'api/fdm/latest/operational/deploy'
     deploy_id = None
+    deploy_url = 'api/fdm/latest/operational/deploy'
     response = requests.post('https://{host}:{port}/{url}'.format(host=host, port=port, url=deploy_url), verify=False,
                              headers=headers)
     if response.status_code != 200:
         print("Failed POST deploy response {} {}".format(response.status_code, response.json()))
     else:
+        print(response.json())
         deploy_id = response.json().get('id')
-        print("POST deployment successful {}".format(deploy_id))
     return deploy_id
 
 
 def get_deployment_status(host, port, access_token, deploy_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send a deployment GET request to determine if the deployment task has completed.
+    Wait for a deployment to complete
     :param host: ftd host address
     :param port: ftd port
-    :param access_token: OAUTH token for device access
+    :param access_token: OAUTH access token
     :param deploy_id: unique identifier for deployment task
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    deploy_url = 'api/fdm/latest/operational/deploy'
     state = None
+    deploy_url = 'api/fdm/latest/operational/deploy'
     response = requests.get(
         'https://{host}:{port}/{url}/{deploy_id}'.format(host=host, port=port, url=deploy_url, deploy_id=deploy_id),
         verify=False, headers=headers)
@@ -87,5 +116,7 @@ def get_deployment_status(host, port, access_token, deploy_id):
         print("Failed GET deploy response {} {}".format(response.status_code, response.json()))
     else:
         state = response.json().get('state')
-        print("GET Deployment state: {}".format(state))
+        # print(response.json())
+        print(state)
+
     return state
