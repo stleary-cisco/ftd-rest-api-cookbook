@@ -1,47 +1,32 @@
-# Example Code for FTD REST API Cookbook Procedures
-
-[https://developer.cisco.com/docs/firepower/threat-defense/cookbook/](https://developer.cisco.com/docs/firepower/threat-defense/cookbook/)
-
-Use this example code to perform REST API operations on an FTD device.
-
-Scripts in examples/demo perform end to end operations as described in the FTD REST API cookbook. Edit connection_constants.py
-to customize the connection information for your FTD device.
-
-Scripts in examples/resources contain the functions used to perform single operations on the FTD device.
+# Example Code for the FTD REST API Cookbook Procedures
 
 
-You can run these scripts in Pycharm or from the command line.
+Link to the [FTD REST API cookbook](https://developer.cisco.com/docs/firepower/threat-defense/cookbook/)
 
-From Pycharm: create a pure python project, do not use the remote deploy kick server. Instead you can execute locally.
-From the command line:
-You will need the requests lib. To see if you have it:
-````
-	python
-	import requests
-````
+Use this example code to perform REST API operations as described in the cookbook on an FTD device.
 
-If you get an error, execute these lines inside the python console:
-````
-	from pip._internal import main
-	main(['install', 'requests'])
-````
+Standalone Python3 scripts are in examples/demo. These scripts execute the end to end cookbook procedures.
 
-To get the files:
-git clone https://github.com/stleary-cisco/ftd-rest-api-cookbook.git
+Python3 scripts in examples/resources contain the functions used to perform single operations in the standalone Python scripts.
 
-To run the scripts:
-````
-	cd examples
-	set PYTHONPATH=.
-	python demo/demo_troubleshoot.py
-````
+## To execute from the command line:
 
-You will need to edit the demo*py files and set the correct host, port, and password values:
+These scripts require Python version 3.0 or greater and the [Requests](https://requests.kennethreitz.org/en/master/) library.
+
+You will need to edit the demo*py files and set the correct host, port, user, and passwd values for your FTD device:
 ````
     host = 'ftd.example'
     port = '443'
     user = 'admin'
     passwd = 'Admin123'
 ````
+
+To run the scripts:
+````
+	cd examples
+	set PYTHONPATH=.
+	python demo/demo_deploy.py
+````
+
 
 
