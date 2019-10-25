@@ -20,7 +20,10 @@ import time
 from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
 from resources.access_token import get_access_token
 
-def main():
+def deploy(host, port, user, passwd):
+    '''
+
+    '''
     """
     End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
     Requires Python v3.0 or greater and the reqeusts library.
@@ -29,41 +32,56 @@ def main():
     are pending at run-time.
     Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
     on the FTD device are the most common sources of error.
+
+    :param host: ftd host address 
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password 
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to update connection_constants.py?")
-        return
+        print("Unable to obtain an access token.")
+        return False
     if get_pending_changes(host, port, access_token):
         deploy_id = post_deployment(host, port, access_token)
         if not deploy_id:
             # should never happen
             print('Unable to obtain a deployment id')
-            return
+            return False
         # wait for a reasonable period of time (about 20 minutes) for the deployment to complete
         for _ in range(80):
             state = get_deployment_status(host, port, access_token, deploy_id)
             if not state:
                 # should never happen
                 print('Unable to obtain the deployment state')
-                return
+                return False
             elif state == 'DEPLOYED':
                 print('Completed deployment successfully')
-                return
-            elif state == 'FAILED':
-                # should never happen
+                return True
+            elif state == 'DEPLOY_FAILED':
                 print('Deployment failed')
-                return
+                return False
             print("sleep 15 seconds")
             time.sleep(15)
         print('Unable to complete the deployment')
+        return False
     else:
-        print("There was nothing to deploy. Did you remember to make a pending change on the FTD device?")
-
+        print("There was nothing to deploy.")
+        return True
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 5:
+        print("Usage: python cookbook_scripts/deploy.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    if deploy(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)

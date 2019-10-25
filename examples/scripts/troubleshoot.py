@@ -17,13 +17,13 @@ express or implied.
 '''
 
 import time
-from resources.access_token import get_access_token
-from resources.high_availability import get_ha_status, resume_HA
+from cookbook_resources.access_token import get_access_token
+from cookbook_resources.troubleshoot import schedule_troubleshoot, get_troubleshoot_job, download_troubleshoot
 
 
 def main():
     """
-    End to end example of code that performs an HA resume and waits for the device to rejoin the HA pair.
+    End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
@@ -35,23 +35,37 @@ def main():
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
-    result = resume_HA(host, port, access_token)
-    if not result:
-        print('Unable to suspend device')
+
+    job_id = schedule_troubleshoot(host=host, port=port, access_token=access_token)
+    if not job_id:
+        # should never happen
+        print('Unable to obtain a job id')
         return
+    # wait for a reasonable period of time (about 20 minutes) for the job to complete
+    status = None
+    filename = None
     for _ in range(80):
-        (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
-        if not node_state:
-            # This is expected if the FTD device was in standby state before being suspended
-            print('Unable to obtain ha status')
-        elif node_state == 'HA_ACTIVE_NODE' or node_state == 'HA_STANDBY_NODE':
-            print("FTD device resumed successfully")
+        (status, filename) = get_troubleshoot_job(host=host, port=port, access_token=access_token, job_id=job_id)
+        if not status:
+            # should never happen
+            print('Unable to obtain the troubleshoot job status')
+            return
+        elif status == 'SUCCESS':
+            print('Completed troubleshoot job successfully {}'.format(filename))
+            break
+        elif status == 'FAILED':
+            # should never happen
+            print('Troubleshoot job failed')
             return
         print("sleep 15 seconds")
         time.sleep(15)
     else:
-        print('Unable to restore HA pair')
+        print('Unable to complete the troubleshoot')
         return
+    try:
+        download_troubleshoot(host=host, port=port, access_token=access_token, filename=filename)
+    except Exception as e:
+        print('Error when downloading troubleshoot file {}'.format(str(e)))
 
 
 if __name__ == '__main__':

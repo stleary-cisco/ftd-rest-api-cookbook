@@ -17,14 +17,13 @@ express or implied.
 '''
 
 import time
-from resources.access_token import get_access_token
-from resources.ips import get_intrusion_settings, update_intrusion_settings
-from resources.syslog_server import post_syslog_server
+from cookbook_resources.access_token import get_access_token
+from cookbook_resources.high_availability import get_ha_status, suspend_HA
 
 
 def main():
     """
-    End to end example of code that assigns an intrusion rule syslog server.
+    End to end example of code that suspends a device in a HA pair.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
@@ -36,22 +35,23 @@ def main():
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
-    syslog_server = {
-        "host": "192.168.100.1",
-        "useManagementInterface": True,
-        "port": "514",
-        "protocol": "UDP",
-        "type": "syslogserver"
-    }
-    syslog_server = post_syslog_server(host, port, access_token, syslog_server)
-    if not syslog_server:
-        print('Unable to post syslog server')
+    result = suspend_HA(host, port, access_token)
+    if not result:
+        print('Unable to suspend device')
         return
-    intrusion_settings = get_intrusion_settings(host, port, access_token)
-    intrusion_settings["syslogServer"] =  syslog_server
-    intrusion_settings = update_intrusion_settings(host, port, access_token, intrusion_settings)
-    if not intrusion_settings:
-        print('Unable to update intrusion settings')
+    for _ in range(80):
+        (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
+        if not node_state:
+            # should never happen
+            print('Unable to obtain ha status')
+            return
+        if node_state == 'HA_SUSPENDED_NODE':
+            print("FTD device suspended successfully")
+            return
+        print("sleep 15 seconds")
+        time.sleep(15)
+    else:
+        print('Never reached suspended state')
         return
 
 

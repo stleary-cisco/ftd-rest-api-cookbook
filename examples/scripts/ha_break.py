@@ -17,8 +17,8 @@ express or implied.
 '''
 
 import time
-from resources.access_token import get_access_token
-from resources.high_availability import get_ha_status, post_break_ha, get_break_ha
+from cookbook_resources.access_token import get_access_token
+from cookbook_resources.high_availability import get_ha_status, post_break_ha, get_break_ha
 
 
 def main():

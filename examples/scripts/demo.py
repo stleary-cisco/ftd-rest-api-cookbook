@@ -11,7 +11,7 @@ writing, software distributed under the License is distributed on an
 "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied.
 '''
-
+import time
 import requests
 
 
@@ -31,16 +31,13 @@ def get_access_token(host, port, user, passwd):
     payload = '{{"grant_type": "password", "username": "{}", "password": "{}"}}'.format(user, passwd)
     auth_headers = {"Content-Type": "application/json", "Accept": "application/json"}
     try:
-        url = "https://{}:{}/api/fdm/latest/fdm/token".format(host, port)
-        print('GET access token URL: {}'.format(url))
-        print('GET access token Payload: {}'.format(payload))
-        response = requests.post(url, data=payload, verify=False, headers=auth_headers)
+        response = requests.post("https://{}:{}/api/fdm/latest/fdm/token".format(host, port),
+                                 data=payload, verify=False, headers=auth_headers)
         if response.status_code == 200:
-            print('{} {}'.format(response.status_code, response.json()))
             access_token = response.json().get('access_token')
-            print("Login successful")
+            print("Login successful, access_token obtained {}".format(access_token))
         else:
-            print("{} {}".format(response.status_code, response.json()))
+            print("Login failed {} {}".format(response.status_code, response.json()))
     except Exception as e:
         print("Exception in POST access token request: {}".format(str(e)))
     return access_token
@@ -61,11 +58,12 @@ def get_pending_changes(host, port, access_token):
     }
     changes_found = False
     pending_changes_url = 'api/fdm/latest/operational/pendingchanges'
-    url = 'https://{host}:{port}/{url}'.format(host=host, port=port, url=pending_changes_url)
-    print('GET pending changes URL: {}'.format(url))
-    response = requests.get(url, verify=False, headers=headers)
-    print("{} {}".format(response.status_code, response.json()))
-    if response.status_code == 200:
+    response = requests.get('https://{host}:{port}/{url}'.format(host=host, port=port, url=pending_changes_url),
+                            verify=False, headers=headers)
+    if response.status_code != 200:
+        print("Failed GET pending changes response {} {}".format(response.status_code, response.json()))
+    else:
+        print(response.json())
         if response.json().get('items'):
             changes_found = True
     return changes_found
@@ -86,12 +84,12 @@ def post_deployment(host, port, access_token):
     }
     deploy_id = None
     deploy_url = 'api/fdm/latest/operational/deploy'
-    url = 'https://{host}:{port}/{url}'.format(host=host, port=port, url=deploy_url)
-    print('POST deployment URL: {}'.format(url))
-    response = requests.post(url, verify=False,
+    response = requests.post('https://{host}:{port}/{url}'.format(host=host, port=port, url=deploy_url), verify=False,
                              headers=headers)
-    print("{} {}".format(response.status_code, response.json()))
-    if response.status_code == 200:
+    if response.status_code != 200:
+        print("Failed POST deploy response {} {}".format(response.status_code, response.json()))
+    else:
+        print(response.json())
         deploy_id = response.json().get('id')
     return deploy_id
 
@@ -111,13 +109,62 @@ def get_deployment_status(host, port, access_token, deploy_id):
     }
     state = None
     deploy_url = 'api/fdm/latest/operational/deploy'
-    url = 'https://{host}:{port}/{url}/{deploy_id}'.format(host=host, port=port, url=deploy_url, deploy_id=deploy_id)
-    print('GET deployment URL: {}'.format(url))
     response = requests.get(
-        url,
+        'https://{host}:{port}/{url}/{deploy_id}'.format(host=host, port=port, url=deploy_url, deploy_id=deploy_id),
         verify=False, headers=headers)
-    print("{}".format(response.status_code))
-    if response.status_code == 200:
+    if response.status_code != 200:
+        print("Failed GET deploy response {} {}".format(response.status_code, response.json()))
+    else:
         state = response.json().get('state')
+        # print(response.json())
         print(state)
+
     return state
+
+
+def main():
+    """
+    End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
+    Requires Python v3.0 or greater and the reqeusts library.
+    You must update the values in host, port, user, and passwd in order to connect to your device.
+    A deployment will be performed only if the user has made changes on the FTD device and those changes
+    are pending at run-time.
+    Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
+    on the FTD device are the most common sources of error.
+    """
+    host = '10.8.21.72'
+    port = '3139'
+    user = 'admin'
+    passwd = 'Admin123!'
+    access_token = get_access_token(host, port, user, passwd)
+    if not access_token:
+        print("Unable to obtain an access token. Did you remember to update connection_constants.py?")
+        return
+    if get_pending_changes(host, port, access_token):
+        deploy_id = post_deployment(host, port, access_token)
+        if not deploy_id:
+            # should never happen
+            print('Unable to obtain a deployment id')
+            return
+        # wait for a reasonable period of time (about 20 minutes) for the deployment to complete
+        for _ in range(80):
+            state = get_deployment_status(host, port, access_token, deploy_id)
+            if not state:
+                # should never happen
+                print('Unable to obtain the deployment state')
+                return
+            elif state == 'DEPLOYED':
+                print('Completed deployment successfully')
+                return
+            elif state == 'DEPLOY_FAILED':
+                print('Deployment failed')
+                return
+            print("sleep 15 seconds")
+            time.sleep(15)
+        print('Unable to complete the deployment')
+    else:
+        print("There was nothing to deploy. Did you remember to make a pending change on the FTD device?")
+
+
+if __name__ == '__main__':
+    main()

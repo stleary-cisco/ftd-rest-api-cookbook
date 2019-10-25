@@ -17,9 +17,9 @@ express or implied.
 '''
 
 import time
-from resources.access_token import get_access_token
-from resources.ips import get_intrusion_policy, post_access_rule
-from resources.smart_license import get_smart_licenses, post_smart_license
+from cookbook_resources.access_token import get_access_token
+from cookbook_resources.ips import get_intrusion_policy, post_access_rule
+from cookbook_resources.smart_license import get_smart_licenses, post_smart_license
 
 
 def main():
