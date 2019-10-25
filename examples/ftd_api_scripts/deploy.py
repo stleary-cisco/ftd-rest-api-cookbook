@@ -17,8 +17,8 @@ express or implied.
 '''
 
 import time
-from resources.deployment import get_pending_changes, post_deployment, get_deployment_status
-from resources.access_token import get_access_token
+from ftd_api_resources.deployment import get_pending_changes, post_deployment, get_deployment_status
+from ftd_api_resources.access_token import get_access_token
 
 def deploy(host, port, user, passwd):
     '''
