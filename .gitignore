@@ -1,0 +1,6 @@
+# ignore compiled and cached files
+**/*.pyc
+**/__pychace__
+
+# ignore IDE files
+.idea/*
