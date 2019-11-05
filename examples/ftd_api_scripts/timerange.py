@@ -24,7 +24,7 @@ def main():
     host = 'u32c01p10-vrouter.cisco.com'
     port = '20248'
     user = 'admin'
-    passwd = 'Cisco123'
+    passwd = 'Cisco@123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
@@ -34,7 +34,7 @@ def main():
         print('Unable to get time range')
         return
     tro = {
-    "name": "TRO_Python_Test",
+    "name": "TRO_Python_Request_Test_2",
     "description": "creating Time Range",
     "effectiveStartDateTime": "2020-07-24T12:08",
     "effectiveEndDateTime": "2020-07-28T12:08",
@@ -63,7 +63,7 @@ def main():
         return
     tro_update = {
     'version': time_range['version'],
-    "name": "TRO_Python_Test_Name_updated",
+    "name": "TRO_Python_Request_Test_Name_updated_2",
     "description": "editing Time Range",
     "effectiveStartDateTime": "2019-11-24T12:08",
     "effectiveEndDateTime": "2019-12-28T12:08",

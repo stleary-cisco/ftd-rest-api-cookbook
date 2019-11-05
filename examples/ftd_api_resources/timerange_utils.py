@@ -53,7 +53,6 @@ def post_time_range(host, port, access_token, tro_object):
     :param tro_object: object representing the time-range
     :return: True if successful, otherwise False
     """
-    result = True
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
@@ -64,10 +63,11 @@ def post_time_range(host, port, access_token, tro_object):
         data=json.dumps(tro_object), verify=False, headers=headers)
     if response.status_code != 200:
         print("Failed POST time range object response {} {}".format(response.status_code, response.json()))
-        result = False
+        tro_object = None
     else:
         print(response.json())
-    return result
+        tro_object = response.json()
+    return tro_object
 
 
 def update_time_range(host, port, access_token, tro_id, tro_object_update):
@@ -81,7 +81,6 @@ def update_time_range(host, port, access_token, tro_id, tro_object_update):
     :param tro_object_update: update time-range object
     :return: True if successful, otherwise False
     """
-    result = True
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
@@ -92,10 +91,11 @@ def update_time_range(host, port, access_token, tro_id, tro_object_update):
         data=json.dumps(tro_object_update), verify=False, headers=headers)
     if response.status_code != 200 and response.status_code != 204:
         print("Failed PUT time-range object response {} {}".format(response.status_code, response.json()))
-        result = False
+        tro_object_update = None
     elif response.status_code == 200:
         print(response.json())
-    return result
+        tro_object_update = response.json()
+    return tro_object_update
 
 
 def get_time_range(host, port, access_token, tro_id):
@@ -120,7 +120,7 @@ def get_time_range(host, port, access_token, tro_id):
     if response.status_code != 200:
         print("Failed GET time range objects response {} {}".format(response.status_code, response.json()))
     else:
-        timerange_object = response.json().get()
+        timerange_object = response.json().get('content')
         print('time range object found: {}'.format(str(timerange_object)))
     return timerange_object
 
