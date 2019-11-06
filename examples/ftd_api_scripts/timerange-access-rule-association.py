@@ -20,7 +20,7 @@ from ftd_api_resources.access_token import get_access_token
 
 def main():
     """
-    End to end example of code that updates an intrusion rule.
+    End to end example of code that updates an access rule.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
