@@ -16,113 +16,82 @@ import json
 import requests
 
 
-def get_all_access_rules(host, port, access_token, parent_id):
+def get_all_timezone_setting(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send access rules GETALL request.
+    Send timezone setting GETALL request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param parent_id: unique identifier for parent access policy
-    :return: access rules
+    :return: timezone-setting
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    access_rules = None
-    access_rules_url = 'api/fdm/latest/policy/accesspolicies/{}/accessrules'.format(parent_id)
+    timezone_setting = None
+    timezone_setting_url = 'api/fdm/latest/devicesettings/default/timezonesettings'
     response = requests.get(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=access_rules_url),
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=timezone_setting_url),
         verify=False, headers=headers)
     if response.status_code != 200:
-        print("Failed GET access rules response {} {}".format(response.status_code, response.json()))
+        print("Failed GET timezone-setting response {} {}".format(response.status_code, response.json()))
     else:
-        access_rules = response.json().get('items')
-        print('access rules found: {}'.format(str(access_rules)))
-    return access_rules
+        timezone_setting = response.json().get('items')[0]
+        print('timezone-setting found: {}'.format(str(timezone_setting)))
+    return timezone_setting
 
 
-def post_access_rule(host, port, access_token, access_rule, parent_id):
+def update_timezone_setting(host, port, access_token, timezone_setting_id, timezone_setting_update):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send an access rule POST request.
+    Send an timezone setting PUT request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param access_rule: object representing the access rule
-    :param parent_id: unique identifier for parent access policy
-    :return: access rule
+    :param timezone_setting_id: unique identifier for a timezone-setting
+    :param timezone_setting_update: updated timezone-setting
+    :return: updated timezone setting
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    access_rule_url = 'api/fdm/latest/policy/accesspolicies/{}/accessrules'.format(parent_id)
-    response = requests.post(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=access_rule_url),
-        data=json.dumps(access_rule), verify=False, headers=headers)
-    if response.status_code != 200:
-        print("Failed POST access rule response {} {}".format(response.status_code, response.json()))
-        access_rule = None
-    else:
-        print(response.json())
-        access_rule = response.json()
-    return access_rule
-
-
-def update_access_rule(host, port, access_token, access_rule_id, access_rule_update, parent_id):
-    """
-    Requires Python v3.0 or greater and requests lib.
-    Send an access rule PUT request.
-    :param host: ftd host address
-    :param port: ftd port
-    :param access_token: OAUTH token for device access
-    :param access_rule_id: unique identifier for an access rule
-    :param access_rule_update: updated access rule
-    :param parent_id: unique identifier for parent access policy
-    :return: updated access rule
-    """
-    headers = {
-        "Accept": "application/json",
-        "Authorization": "Bearer {}".format(access_token)
-    }
-    access_rule_url = 'api/fdm/latest/policy/accesspolicies/{}/accessrules/{}'.format(parent_id, access_rule_id)
+    timezone_setting_url = 'api/fdm/latest/devicesettings/default/timezonesettings/{}'.format(timezone_setting_id)
     response = requests.put(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=access_rule_url),
-        data=json.dumps(access_rule_update), verify=False, headers=headers)
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=timezone_setting_url),
+        data=json.dumps(timezone_setting_update), verify=False, headers=headers)
     if response.status_code != 200 and response.status_code != 204:
-        print("Failed PUT access rule response {} {}".format(response.status_code, response.json()))
-        access_rule_update = None
+        print("Failed PUT timezone-setting response {} {}".format(response.status_code, response.json()))
+        timezone_setting_update = None
     elif response.status_code == 200:
         print(response.json())
-        access_rule_update = response.json()
-    return access_rule_update
+        timezone_setting_update = response.json()
+    return timezone_setting_update
 
 
-def get_access_rule(host, port, access_token, access_rule_id, parent_id):
+def get_timezone_setting(host, port, access_token, timezone_setting_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send an access rule GET request.
+    Send an timezone setting GET request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param access_rule_id: unique identifier for an access rule
-    :param parent_id: unique identifier for parent access policy
-    :return: True if successful, otherwise False
+    :param timezone_setting_id: unique identifier for a timezone setting
+    :return: timezone setting
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    access_rule = None
-    access_rule_url = 'api/fdm/latest/policy/accesspolicies/{}/accessrules/{}'.format(parent_id, access_rule_id)
+    timezone_setting = None
+    timezone_setting_url = 'api/fdm/latest/devicesettings/default/timezonesettings/{}'.format(timezone_setting_id)
     response = requests.get(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=access_rule_url),
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=timezone_setting_url),
         verify=False, headers=headers)
     if response.status_code != 200:
-        print("Failed GET access rule response {} {}".format(response.status_code, response.json()))
+        print("Failed GET timezone-setting response {} {}".format(response.status_code, response.json()))
     else:
-        access_rule = response.json()
-        print('access rule found: {}'.format(str(access_rule)))
-    return access_rule
+        timezone_setting = response.json()
+        print('timezone-setting found: {}'.format(str(timezone_setting)))
+    return timezone_setting

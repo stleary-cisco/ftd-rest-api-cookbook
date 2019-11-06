@@ -12,21 +12,19 @@ writing, software distributed under the License is distributed on an
 express or implied.
 '''
 
+import sys
 from ftd_api_resources.timezone_utils import get_all_time_zones, post_time_zone, update_time_zone, get_time_zone, \
     delete_time_zone
 from ftd_api_resources.access_token import get_access_token
 
 
-def main():
+def time_zone_actions(host, port, user, passwd):
     """
     End to end example of code that updates a time-zone object.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
-    host = 'u32c01p10-vrouter.cisco.com'
-    port = '20248'
-    user = 'admin'
-    passwd = 'Cisco@123'
+
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
@@ -86,4 +84,13 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    if len(sys.argv) != 5:
+        print("Usage: python cookbook_scripts/timezone.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    time_zone_actions(host, port, user, passwd)
