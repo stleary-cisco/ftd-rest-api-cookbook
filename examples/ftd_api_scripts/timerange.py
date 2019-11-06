@@ -12,19 +12,17 @@ writing, software distributed under the License is distributed on an
 express or implied.
 '''
 
+import sys
 from ftd_api_resources.timerange_utils import get_all_time_range, post_time_range, update_time_range, get_time_range, delete_time_range
 from ftd_api_resources.access_token import get_access_token
 
-def main():
+def time_range_actions(host, port, user, passwd):
     """
     End to end example of code that updates a time-range object.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
-    host = 'u32c01p10-vrouter.cisco.com'
-    port = '20248'
-    user = 'admin'
-    passwd = 'Cisco@123'
+
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
@@ -32,7 +30,6 @@ def main():
     time_range = get_all_time_range(host, port, access_token)
     if not time_range:
         print('Unable to get time range')
-        return
     tro = {
     "name": "TRO_Python_Request_Test_7",
     "description": "creating Time Range",
@@ -101,4 +98,13 @@ def main():
         return
 
 if __name__ == '__main__':
-    main()
+
+    if len(sys.argv) != 5:
+        print("Usage: python cookbook_scripts/timerange.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    time_range_actions(host, port, user, passwd)

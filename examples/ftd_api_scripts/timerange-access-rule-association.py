@@ -12,33 +12,30 @@ writing, software distributed under the License is distributed on an
 express or implied.
 '''
 
+import sys
 from ftd_api_resources.time_range_access_rule_association_utils import get_all_access_rules, \
     post_access_rule, update_access_rule, get_access_rule
 from ftd_api_resources.timerange_utils import post_time_range
 from ftd_api_resources.access_token import get_access_token
 
 
-def main():
+def timerange_access_rule_association_actions(host, port, user, passwd, parent_policy_id):
     """
     End to end example of code that updates an access rule.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
-    host = 'u32c01p10-vrouter.cisco.com'
-    port = '20248'
-    user = 'admin'
-    passwd = 'Cisco@123'
-    parent_id = 'c78e66bc-cb57-43fe-bcbf-96b79b3475b3'
+
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
-    access_rules = get_all_access_rules(host, port, access_token, parent_id)
+    access_rules = get_all_access_rules(host, port, access_token, parent_policy_id)
     if not access_rules:
         print('Unable to get access rule')
         return
     tro = {
-        "name": "TRO_Python_Request_Test_12",
+        "name": "TRO_For_Python_Request_Test",
         "description": "Creating Time Range",
         "effectiveStartDateTime": "2020-07-24T12:08",
         "effectiveEndDateTime": "2020-07-28T12:08",
@@ -66,7 +63,7 @@ def main():
         print('Unable to create time range object')
         return
     access_rule = {
-        "name": "Test_Python_Request_For_Access_Rule_4",
+        "name": "Test_Python_Request_For_Access_Rule_5",
         "sourceZones": [],
         "destinationZones": [],
         "sourceNetworks": [],
@@ -83,13 +80,13 @@ def main():
         "sourceDynamicObjects": [],
         "type": "accessrule"
     }
-    access_rule = post_access_rule(host, port, access_token, access_rule, parent_id)
+    access_rule = post_access_rule(host, port, access_token, access_rule, parent_policy_id)
     if not access_rule:
         print('Unable to create access rule')
         return
     access_rule_update = {
         "version": access_rule['version'],
-        "name": "Test_Python_Request_For_Access_Rule__4_Updated",
+        "name": "Test_Python_Request_For_Access_Rule__5_Updated",
         "ruleId": access_rule['ruleId'],
         "sourceZones": [],
         "destinationZones": [],
@@ -107,18 +104,18 @@ def main():
         "sourceDynamicObjects": [],
         "type": "accessrule"
     }
-    updated_access_rule = update_access_rule(host, port, access_token, access_rule['id'], access_rule_update, parent_id)
+    updated_access_rule = update_access_rule(host, port, access_token, access_rule['id'], access_rule_update, parent_policy_id)
     if not updated_access_rule:
         print('Unable to update access rule')
         return
-    access_rule = get_access_rule(host, port, access_token, updated_access_rule['id'], parent_id)
+    access_rule = get_access_rule(host, port, access_token, updated_access_rule['id'], parent_policy_id)
     if not access_rule:
         print('Unable to get access rule')
         return
     print('Access rule name is {}'.format(access_rule['name']))
     access_rule_update = {
         "version": access_rule['version'],
-        "name": "Test_Python_Request_For_Access_Rule_Deleted_TRO_4",
+        "name": "Test_Python_Request_For_Access_Rule_Deleted_TRO_5",
         "ruleId": access_rule['ruleId'],
         "sourceZones": [],
         "destinationZones": [],
@@ -136,7 +133,7 @@ def main():
         "type": "accessrule"
     }
     updated_access_rule = update_access_rule(host, port, access_token,
-                                                             access_rule['id'], access_rule_update, parent_id)
+                                                             access_rule['id'], access_rule_update, parent_policy_id)
     if not updated_access_rule:
         print('Unable to update access rule')
         return
@@ -144,4 +141,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    if len(sys.argv) != 6:
+        print("Usage: python cookbook_scripts/timerange-access-rule-association.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    parent_policy_id = sys.argv[5]
+    timerange_access_rule_association_actions(host, port, user, passwd, parent_policy_id)
