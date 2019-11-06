@@ -19,12 +19,11 @@ import requests
 def get_all_time_range(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send time range objects GET request.
+    Send time range objects GETALL request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param policy_name: URL encoded name of the policy to retrieve
-    :return: time range objects object
+    :return: time-range objects
     """
     headers = {
         "Accept": "application/json",
@@ -51,7 +50,7 @@ def post_time_range(host, port, access_token, tro_object):
     :param port: ftd port
     :param access_token: OAUTH token for device access
     :param tro_object: object representing the time-range
-    :return: True if successful, otherwise False
+    :return: time-range object
     """
     headers = {
         "Accept": "application/json",
@@ -73,13 +72,13 @@ def post_time_range(host, port, access_token, tro_object):
 def update_time_range(host, port, access_token, tro_id, tro_object_update):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update a time-range object
+    Send a time range object PUT request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param tro_id: unique identifier for time-range object
-    :param tro_object_update: update time-range object
-    :return: True if successful, otherwise False
+    :param tro_id: unique identifier for a time-range object
+    :param tro_object_update: updated time-range object
+    :return: time-range object
     """
     headers = {
         "Accept": "application/json",
@@ -101,12 +100,12 @@ def update_time_range(host, port, access_token, tro_id, tro_object_update):
 def get_time_range(host, port, access_token, tro_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update a time-range object
+    Send a time range object GET request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param tro_id: unique identifier for time-range object
-    :return: True if successful, otherwise False
+    :param tro_id: unique identifier for a time-range object
+    :return: time-range object
     """
     headers = {
         "Accept": "application/json",
@@ -120,7 +119,7 @@ def get_time_range(host, port, access_token, tro_id):
     if response.status_code != 200:
         print("Failed GET time range objects response {} {}".format(response.status_code, response.json()))
     else:
-        timerange_object = response.json().get('content')
+        timerange_object = response.json()
         print('time range object found: {}'.format(str(timerange_object)))
     return timerange_object
 
@@ -128,18 +127,18 @@ def get_time_range(host, port, access_token, tro_id):
 def delete_time_range(host, port, access_token, tro_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update a time-range object
+    Send a time range object DELETE request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
     :param tro_id: unique identifier for time-range object
-    :return: True if successful, otherwise False
+    :return: response status code
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    timerange_object = None
+    status_code_for_delete_operation = None
     tro_url = 'api/fdm/latest/object/timeranges/{}'.format(tro_id)
     response = requests.delete(
         'https://{host}:{port}/{url}'.format(host=host, port=port, url=tro_url),
@@ -147,6 +146,6 @@ def delete_time_range(host, port, access_token, tro_id):
     if response.status_code != 204:
         print("Failed DELETE time range object response {} {}".format(response.status_code, response.json()))
     else:
-        timerange_object = response.json().get()
-        print('time range object is deleted, error code is: {}'.format(response.status_code))
-    return timerange_object
+        status_code_for_delete_operation = response.status_code
+        print('time range object is deleted, error code is: {}'.format(status_code_for_delete_operation))
+    return status_code_for_delete_operation

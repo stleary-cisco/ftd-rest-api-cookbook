@@ -17,7 +17,7 @@ from ftd_api_resources.access_token import get_access_token
 
 def main():
     """
-    End to end example of code that updates an intrusion rule.
+    End to end example of code that updates a time-range object.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
@@ -34,7 +34,7 @@ def main():
         print('Unable to get time range')
         return
     tro = {
-    "name": "TRO_Python_Request_Test_2",
+    "name": "TRO_Python_Request_Test_7",
     "description": "creating Time Range",
     "effectiveStartDateTime": "2020-07-24T12:08",
     "effectiveEndDateTime": "2020-07-28T12:08",
@@ -63,7 +63,7 @@ def main():
         return
     tro_update = {
     'version': time_range['version'],
-    "name": "TRO_Python_Request_Test_Name_updated_2",
+    "name": "TRO_Python_Request_Test_Name_updated_7",
     "description": "editing Time Range",
     "effectiveStartDateTime": "2019-11-24T12:08",
     "effectiveEndDateTime": "2019-12-28T12:08",
