@@ -12,12 +12,14 @@ writing, software distributed under the License is distributed on an
 express or implied.
 '''
 
-from ftd_api_resources.timezone_utils import get_all_time_zones, post_time_zone, update_time_zone, get_time_zone, delete_time_zone
+from ftd_api_resources.timezone_utils import get_all_time_zones, post_time_zone, update_time_zone, get_time_zone, \
+    delete_time_zone
 from ftd_api_resources.access_token import get_access_token
+
 
 def main():
     """
-    End to end example of code that updates an intrusion rule.
+    End to end example of code that updates a time-zone object.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
     """
@@ -29,58 +31,59 @@ def main():
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
         return
-    time_range = get_all_time_zones(host, port, access_token)
-    if not time_range:
-        print('Unable to get time range')
+    time_zones = get_all_time_zones(host, port, access_token)
+    if not time_zones:
+        print('Unable to get time zones')
         return
-    tro = {
-        "name": "TimeZone Object1",
-	    "timeZoneId": "Asia/Kolkata",
-	    "description": "TestTimeZone",
-	    "dstDayRecurrence": {
-	    "startMonth": "JUN",
-		"startWeek": "FIRST",
-		"startDayOfWeek": "SAT",
-		"startTime": "09:00",
-		"endMonth": "JUN",
-		"endWeek": "SECOND",
-		"endDayOfWeek": "SAT",
-		"endTime": "11:01",
-		"offset": 45,
-		"type": "daylightsavingdayrecurrence"
-	},
-	    "type": "timezoneobject"
-}
-
-    time_range = post_time_zone(host, port, access_token, tro)
-    if not time_range:
-        print('Unable to create time range object')
-        return
-    tro_update = {
-        'version': time_range['version'],
-        "name": "TimeZone Object1",
+    tzo = {
+        "name": "TZO1",
         "timeZoneId": "Asia/Kolkata",
-	    "description": "TestTimeZone",
+        "description": "TestTimeZone",
+        "dstDayRecurrence": {
+            "startMonth": "JUN",
+            "startWeek": "FIRST",
+            "startDayOfWeek": "SAT",
+            "startTime": "09:00",
+            "endMonth": "JUN",
+            "endWeek": "SECOND",
+            "endDayOfWeek": "SAT",
+            "endTime": "11:01",
+            "offset": 45,
+            "type": "daylightsavingdayrecurrence"
+        },
+        "type": "timezoneobject"
+    }
+
+    time_zone = post_time_zone(host, port, access_token, tzo)
+    if not time_zone:
+        print('Unable to create time zone object')
+        return
+    tz_update = {
+        'version': time_zone['version'],
+        "name": "TZO1",
+        "timeZoneId": "Asia/Kolkata",
+        "description": "TestTimeZone",
         "dstDateRange": {
             "startDateTime": "2020-08-19T15:22:10",
             "endDateTime": "2020-09-20T18:16",
             "type": "daylightsavingdaterange"
         },
-	    "type": "timezoneobject"
+        "type": "timezoneobject"
     }
-    updated_tro = update_time_zone(host, port, access_token, time_range['id'], tro_update)
-    if not updated_tro:
-        print('Unable to update time range object')
+    updated_tz = update_time_zone(host, port, access_token, time_zone['id'], tz_update)
+    if not updated_tz:
+        print('Unable to update time zone object')
         return
-    tro = get_time_zone(host, port, access_token, updated_tro['id'])
-    if not tro:
-        print('Unable to get time range object')
+    tzo = get_time_zone(host, port, access_token, updated_tz['id'])
+    if not tzo:
+        print('Unable to get time zone object')
         return
-    print('TRO name is {}'.format(tro['name']))
-    returnCode = delete_time_zone(host, port, access_token, tro['id'])
+    print('TimeZone Object name is {}'.format(tzo['name']))
+    returnCode = delete_time_zone(host, port, access_token, tzo['id'])
     if not returnCode:
-        print('Unable to delete time range object')
+        print('Unable to delete time zone object')
         return
+
 
 if __name__ == '__main__':
     main()

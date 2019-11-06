@@ -19,50 +19,49 @@ import requests
 def get_all_time_zones(host, port, access_token):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send time range objects GET request.
+    Send time zone objects GETALL request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param policy_name: URL encoded name of the policy to retrieve
-    :return: time range objects object
+    :return: time-zone objects
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    timerange_objects = None
-    tro_url = 'api/fdm/latest/object/timeranges'
+    timezone_objects = None
+    tzo_url = 'api/fdm/latest/object/timezoneobjects'
     response = requests.get(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tro_url),
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tzo_url),
         verify=False, headers=headers)
     if response.status_code != 200:
-        print("Failed GET time range objects response {} {}".format(response.status_code, response.json()))
+        print("Failed GET time zone objects response {} {}".format(response.status_code, response.json()))
     else:
-        timerange_objects = response.json().get('items')
-        print('time range objects found: {}'.format(str(timerange_objects)))
-    return timerange_objects
+        timezone_objects = response.json().get('items')
+        print('time range objects found: {}'.format(str(timezone_objects)))
+    return timezone_objects
 
 
-def post_time_zone(host, port, access_token, tro_object):
+def post_time_zone(host, port, access_token, tzo_object):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send a time range object POST request.
+    Send a time zone object POST request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param tro_object: object representing the time-range
-    :return: True if successful, otherwise False
+    :param tzo_object: object representing the time-zone
+    :return: time-zone object
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    tro_url = 'api/fdm/latest/object/timeranges'
+    tzo_url = 'api/fdm/latest/object/timezoneobjects'
     response = requests.post(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tro_url),
-        data=json.dumps(tro_object), verify=False, headers=headers)
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tzo_url),
+        data=json.dumps(tzo_object), verify=False, headers=headers)
     if response.status_code != 200:
-        print("Failed POST time range object response {} {}".format(response.status_code, response.json()))
+        print("Failed POST time zone object response {} {}".format(response.status_code, response.json()))
         tro_object = None
     else:
         print(response.json())
@@ -70,83 +69,83 @@ def post_time_zone(host, port, access_token, tro_object):
     return tro_object
 
 
-def update_time_zone(host, port, access_token, tro_id, tro_object_update):
+def update_time_zone(host, port, access_token, tzo_id, tzo_object_update):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update a time-range object
+    Send a time zone object PUT request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param tro_id: unique identifier for time-range object
-    :param tro_object_update: update time-range object
-    :return: True if successful, otherwise False
+    :param tzo_id: unique identifier for a time-zone object
+    :param tzo_object_update: updated time-zone object
+    :return: time-zone object
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    tro_url = 'api/fdm/latest/object/timeranges/{}'.format(tro_id)
+    tzo_url = 'api/fdm/latest/object/timezoneobjects/{}'.format(tzo_id)
     response = requests.put(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tro_url),
-        data=json.dumps(tro_object_update), verify=False, headers=headers)
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tzo_url),
+        data=json.dumps(tzo_object_update), verify=False, headers=headers)
     if response.status_code != 200 and response.status_code != 204:
-        print("Failed PUT time-range object response {} {}".format(response.status_code, response.json()))
-        tro_object_update = None
+        print("Failed PUT time-zone object response {} {}".format(response.status_code, response.json()))
+        tzo_object_update = None
     elif response.status_code == 200:
         print(response.json())
-        tro_object_update = response.json()
-    return tro_object_update
+        tzo_object_update = response.json()
+    return tzo_object_update
 
 
-def get_time_zone(host, port, access_token, tro_id):
+def get_time_zone(host, port, access_token, tzo_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update a time-range object
+    Send a time zone object GET request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param tro_id: unique identifier for time-range object
-    :return: True if successful, otherwise False
+    :param tzo_id: unique identifier for a time-zone object
+    :return: time-zone object
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    timerange_object = None
-    tro_url = 'api/fdm/latest/object/timeranges/{}'.format(tro_id)
+    timezone_object = None
+    tzo_url = 'api/fdm/latest/object/timezoneobjects/{}'.format(tzo_id)
     response = requests.get(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tro_url),
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tzo_url),
         verify=False, headers=headers)
     if response.status_code != 200:
-        print("Failed GET time range objects response {} {}".format(response.status_code, response.json()))
+        print("Failed GET time zone objects response {} {}".format(response.status_code, response.json()))
     else:
-        timerange_object = response.json().get('content')
-        print('time range object found: {}'.format(str(timerange_object)))
-    return timerange_object
+        timezone_object = response.json()
+        print('time zone object found: {}'.format(str(timezone_object)))
+    return timezone_object
 
 
-def delete_time_zone(host, port, access_token, tro_id):
+def delete_time_zone(host, port, access_token, tzo_id):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update a time-range object
+    Send a time zone object DELETE request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
-    :param tro_id: unique identifier for time-range object
-    :return: True if successful, otherwise False
+    :param tzo_id: unique identifier for time-zone object
+    :return: response status code
     """
     headers = {
         "Accept": "application/json",
         "Authorization": "Bearer {}".format(access_token)
     }
-    timerange_object = None
-    tro_url = 'api/fdm/latest/object/timeranges/{}'.format(tro_id)
+    status_code_for_delete_operation = None
+    tzo_url = 'api/fdm/latest/object/timezoneobjects/{}'.format(tzo_id)
     response = requests.delete(
-        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tro_url),
+        'https://{host}:{port}/{url}'.format(host=host, port=port, url=tzo_url),
         verify=False, headers=headers)
     if response.status_code != 204:
-        print("Failed DELETE time range object response {} {}".format(response.status_code, response.json()))
+        print("Failed DELETE time zone object response {} {}".format(response.status_code, response.json()))
     else:
-        timerange_object = response.json().get()
-        print('time range object is deleted, error code is: {}'.format(response.status_code))
-    return timerange_object
+        status_code_for_delete_operation = response.status_code
+        print('time zone object is deleted, error code is: {}'.format(status_code_for_delete_operation))
+    return status_code_for_delete_operation
