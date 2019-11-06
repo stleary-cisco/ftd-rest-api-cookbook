@@ -19,7 +19,7 @@ import requests
 def update_intf_to_pppoe(host, port, access_token, intf_object, pppoe, ip_addr=''):
     """
     Requires Python v3.0 or greater and requests lib.
-    Update an interface
+    Update an interface with pppoe object
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access

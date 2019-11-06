@@ -24,6 +24,18 @@ def pppoe_dynamic(host, port, user, passwd, intf_hw_name='GigabitEthernet1/1', v
     End to end example of code that updates a physical interface to enable PPPoE on it.
     Requires Python v3.0 or greater and the reqeusts library.
     You must update the values for host, port, user, and password to connect to your device.
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :param intf_hw_name: hardwareName of the interface on which to enable PPPoE
+    :param vpdn_grp_name: Virtual Private Dialup Network (VPDN) group name
+    :param pppoe_user: username for authenticating with PPPoE server
+    :param pppoe_password: password for authenticating with PPPoE server
+    :param ppp_auth_type: authentication protocol
+    :param pppoe_metric: route metric
+    :param obtain_default_route: if True default route will be obtained from PPPoE server
+    :return: True if successful, otherwise False
     """
     pppoe = {
         'vpdnGrpName': vpdn_grp_name,
@@ -40,20 +52,21 @@ def pppoe_dynamic(host, port, user, passwd, intf_hw_name='GigabitEthernet1/1', v
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        return False
     intf_object = get_intf_object(host, port, access_token, intf_hw_name)
     if not intf_object:
         print(
             'Unable to get intf_object - please set the intf_hw_name to a valid hardwareName of an interface on your device')
-        return
+        return False
 
     # Enable Dynamic PPPoE on interface
     result = update_intf_to_pppoe(host, port, access_token, intf_object, pppoe)
     if not result:
         print('Unable to update intf to enable pppoe')
-        return
+        return False
     else:
         print('Interface {} successfully set to Dynamic PPPoE'.format(intf_hw_name))
+        return True
 
 
 if __name__ == '__main__':
@@ -61,21 +74,13 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 5:
         print(
-            "Usage: python ftd_api_scripts/pppoe_dynamic.py host port user passwd [intf_hw_name, vpdn_grp_name, pppoe_user, pppoe_password, ppp_auth_type, pppoe_metric, obtain_default_route]")
+            "Usage: python ftd_api_scripts/pppoe_dynamic.py host port user passwd")
         exit(1)
 
     host = sys.argv[1]
     port = sys.argv[2]
     user = sys.argv[3]
     passwd = sys.argv[4]
-    # intf_hw_name = sys.argv[5]
-    # vpdn_grp_name = sys.argv[6]
-    # pppoe_user = sys.argv[7]
-    # pppoe_password = sys.argv[8]
-    # ppp_auth_type = sys.argv[9]
-    # pppoe_metric = sys.argv[10]
-    # obtain_default_route = sys.argv[11]
-    # if pppoe_dynamic(host=host, port=port, user=user, passwd=passwd, intf_hw_name=intf_hw_name, vpdn_grp_name=vpdn_grp_name, pppoe_user=pppoe_user, pppoe_password=pppoe_password, ppp_auth_type=ppp_auth_type, pppoe_metric=pppoe_metric, obtain_default_route=obtain_default_route):
     if pppoe_dynamic(host=host, port=port, user=user, passwd=passwd):
         exit(0)
     else:

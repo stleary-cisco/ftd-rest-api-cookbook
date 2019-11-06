@@ -18,7 +18,7 @@ import requests
 def get_intf_object(host, port, access_token, intf_hw_name):
     """
     Requires Python v3.0 or greater and requests lib.
-    Send an intrusion rule GET request.
+    Send an interface GET request.
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH token for device access
@@ -39,14 +39,7 @@ def get_intf_object(host, port, access_token, intf_hw_name):
     else:
         for intf in response.json().get('items'):
             if intf['hardwareName'] == intf_hw_name:
-                response = requests.get(
-                    'https://{host}:{port}/{url}/{id}'.format(host=host, port=port, url=intf_url, id=intf['id']),
-                    verify=False, headers=headers)
-                if response.status_code != 200:
-                    print('Failed GET interface {} {}'.format(response.status_code, response.json()))
-                    return
-                else:
-                    intf_object = response.json()
+                intf_object = intf
                 break
         else:
             print("Failed to find interface with the hardwareName: {}".format(intf_hw_name))
