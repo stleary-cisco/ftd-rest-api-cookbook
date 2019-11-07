@@ -23,7 +23,11 @@ def timezoneobject_timezonesetting_associated_actions(host, port, user, passwd):
     """
     End to end example of code that updates the timezone-setting.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+    :param host: ftd host address
+    :param port: ftd port
+    :param user: login user name
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
 
     access_token = get_access_token(host, port, user, passwd)
@@ -79,7 +83,7 @@ def timezoneobject_timezonesetting_associated_actions(host, port, user, passwd):
 if __name__ == '__main__':
 
     if len(sys.argv) != 5:
-        print("Usage: python cookbook_scripts/timezoneobject_timezonesetting_association.py host port user passwd")
+        print("Usage: python ftd_api_scripts/timezoneobject_timezonesetting_association.py host port user passwd")
         exit(1)
 
     host = sys.argv[1]
