@@ -108,7 +108,7 @@ def time_range_actions(host, port, user, passwd):
 if __name__ == '__main__':
 
     if len(sys.argv) != 5:
-        print("Usage: python cookbook_scripts/timerange.py host port user passwd")
+        print("Usage: python ftd_api_scripts/timerange.py host port user passwd")
         exit(1)
 
     host = sys.argv[1]

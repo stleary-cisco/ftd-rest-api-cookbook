@@ -150,7 +150,7 @@ def timerange_access_rule_association_actions(host, port, user, passwd):
 if __name__ == '__main__':
 
     if len(sys.argv) != 6:
-        print("Usage: python cookbook_scripts/timerange-access-rule-association.py host port user passwd")
+        print("Usage: python ftd_api_scripts/timerange-access-rule-association.py host port user passwd")
         exit(1)
 
     host = sys.argv[1]
