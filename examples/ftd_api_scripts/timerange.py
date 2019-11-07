@@ -16,86 +16,94 @@ import sys
 from ftd_api_resources.timerange_utils import get_all_time_range, post_time_range, update_time_range, get_time_range, delete_time_range
 from ftd_api_resources.access_token import get_access_token
 
+
 def time_range_actions(host, port, user, passwd):
     """
     End to end example of code that updates a time-range object.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+    :param host: ftd host address
+    :param port: ftd port
+    :param user: login user name
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
 
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        return False
     time_range = get_all_time_range(host, port, access_token)
     if not time_range:
         print('Unable to get time range')
+        return False
     tro = {
-    "name": "TRO_Python_Request_Test_7",
-    "description": "creating Time Range",
-    "effectiveStartDateTime": "2020-07-24T12:08",
-    "effectiveEndDateTime": "2020-07-28T12:08",
-    "recurrenceList": [
-    {
-      "recurrenceType": "DAILY_INTERVAL",
-      "days": ["MON","TUE","FRI"],
-      "dailyStartTime": "08:00",
-      "dailyEndTime": "09:00",
-      "type" : "recurrence"
-    },
-    {
-      "recurrenceType": "RANGE",
-      "rangeStartTime": "09:00",
-      "rangeEndTime": "11:00",
-      "rangeStartDay": "MON",
-      "rangeEndDay": "TUE",
-      "type" : "recurrence"
+        "name": "TRO_Python_Request_Test_With_Boolean_Return_Value_1",
+        "description": "creating Time Range",
+        "effectiveStartDateTime": "2020-07-24T12:08",
+        "effectiveEndDateTime": "2020-07-28T12:08",
+        "recurrenceList": [
+            {
+                "recurrenceType": "DAILY_INTERVAL",
+                "days": ["MON", "TUE", "FRI"],
+                "dailyStartTime": "08:00",
+                "dailyEndTime": "09:00",
+                "type": "recurrence"
+            },
+            {
+                "recurrenceType": "RANGE",
+                "rangeStartTime": "09:00",
+                "rangeEndTime": "11:00",
+                "rangeStartDay": "MON",
+                "rangeEndDay": "TUE",
+                "type": "recurrence"
+            }
+        ],
+        "type": "timerangeobject"
     }
-  ],
-  "type": "timerangeobject"
-  }
     time_range = post_time_range(host, port, access_token, tro)
     if not time_range:
         print('Unable to create time range object')
-        return
+        return False
     tro_update = {
-    'version': time_range['version'],
-    "name": "TRO_Python_Request_Test_Name_updated_7",
-    "description": "editing Time Range",
-    "effectiveStartDateTime": "2019-11-24T12:08",
-    "effectiveEndDateTime": "2019-12-28T12:08",
-    "recurrenceList": [
-    {
-      "recurrenceType": "DAILY_INTERVAL",
-      "days": ["MON","TUE","FRI"],
-      "dailyStartTime": "08:00",
-      "dailyEndTime": "09:00",
-      "type" : "recurrence"
-    },
-    {
-      "recurrenceType": "RANGE",
-      "rangeStartTime": "09:00",
-      "rangeEndTime": "11:00",
-      "rangeStartDay": "MON",
-      "rangeEndDay": "TUE",
-      "type" : "recurrence"
-    }
-  ],
-  "type": "timerangeobject"
+        'version': time_range['version'],
+        "name": "TRO_Python_Request_Test_Name_updated_With_Boolean_Return_Value_1",
+        "description": "editing Time Range",
+        "effectiveStartDateTime": "2019-11-24T12:08",
+        "effectiveEndDateTime": "2019-12-28T12:08",
+        "recurrenceList": [
+            {
+                "recurrenceType": "DAILY_INTERVAL",
+                "days": ["MON", "TUE", "FRI"],
+                "dailyStartTime": "08:00",
+                "dailyEndTime": "09:00",
+                "type": "recurrence"
+            },
+            {
+                "recurrenceType": "RANGE",
+                "rangeStartTime": "09:00",
+                "rangeEndTime": "11:00",
+                "rangeStartDay": "MON",
+                "rangeEndDay": "TUE",
+                "type": "recurrence"
+            }
+        ],
+        "type": "timerangeobject"
     }
     updated_tro = update_time_range(host, port, access_token, time_range['id'], tro_update)
     if not updated_tro:
         print('Unable to update time range object')
-        return
+        return False
     tro = get_time_range(host, port, access_token, updated_tro['id'])
     if not tro:
         print('Unable to get time range object')
-        return
+        return False
     print('TRO name is {}'.format(tro['name']))
     returnCode = delete_time_range(host, port, access_token, tro['id'])
     if not returnCode:
         print('Unable to delete time range object')
-        return
+        return False
+    return True
+
 
 if __name__ == '__main__':
 
@@ -107,4 +115,7 @@ if __name__ == '__main__':
     port = sys.argv[2]
     user = sys.argv[3]
     passwd = sys.argv[4]
-    time_range_actions(host, port, user, passwd)
+    if time_range_actions(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)

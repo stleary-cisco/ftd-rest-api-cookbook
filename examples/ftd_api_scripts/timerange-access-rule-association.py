@@ -23,19 +23,23 @@ def timerange_access_rule_association_actions(host, port, user, passwd, parent_p
     """
     End to end example of code that updates an access rule.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+    :param host: ftd host address
+    :param port: ftd port
+    :param user: login user name
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
 
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
         print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        return False
     access_rules = get_all_access_rules(host, port, access_token, parent_policy_id)
     if not access_rules:
         print('Unable to get access rule')
-        return
+        return False
     tro = {
-        "name": "TRO_For_Python_Request_Test",
+        "name": "TRO_For_Python_Request_Test_6.6.0_1",
         "description": "Creating Time Range",
         "effectiveStartDateTime": "2020-07-24T12:08",
         "effectiveEndDateTime": "2020-07-28T12:08",
@@ -61,9 +65,9 @@ def timerange_access_rule_association_actions(host, port, user, passwd, parent_p
     time_range = post_time_range(host, port, access_token, tro)
     if not time_range:
         print('Unable to create time range object')
-        return
+        return False
     access_rule = {
-        "name": "Test_Python_Request_For_Access_Rule_5",
+        "name": "Test_Python_Request_For_Access_Rule_6.6.0_1",
         "sourceZones": [],
         "destinationZones": [],
         "sourceNetworks": [],
@@ -83,10 +87,10 @@ def timerange_access_rule_association_actions(host, port, user, passwd, parent_p
     access_rule = post_access_rule(host, port, access_token, access_rule, parent_policy_id)
     if not access_rule:
         print('Unable to create access rule')
-        return
+        return False
     access_rule_update = {
         "version": access_rule['version'],
-        "name": "Test_Python_Request_For_Access_Rule__5_Updated",
+        "name": "Test_Python_Request_For_Access_Rule__6.6.0_Updated_1",
         "ruleId": access_rule['ruleId'],
         "sourceZones": [],
         "destinationZones": [],
@@ -104,18 +108,19 @@ def timerange_access_rule_association_actions(host, port, user, passwd, parent_p
         "sourceDynamicObjects": [],
         "type": "accessrule"
     }
-    updated_access_rule = update_access_rule(host, port, access_token, access_rule['id'], access_rule_update, parent_policy_id)
+    updated_access_rule = update_access_rule(host, port, access_token, access_rule['id'], access_rule_update,
+                                             parent_policy_id)
     if not updated_access_rule:
         print('Unable to update access rule')
-        return
+        return False
     access_rule = get_access_rule(host, port, access_token, updated_access_rule['id'], parent_policy_id)
     if not access_rule:
         print('Unable to get access rule')
-        return
+        return False
     print('Access rule name is {}'.format(access_rule['name']))
     access_rule_update = {
         "version": access_rule['version'],
-        "name": "Test_Python_Request_For_Access_Rule_Deleted_TRO_5",
+        "name": "Test_Python_Request_For_Access_Rule_Deleted_TRO_6.6.0_1",
         "ruleId": access_rule['ruleId'],
         "sourceZones": [],
         "destinationZones": [],
@@ -133,11 +138,12 @@ def timerange_access_rule_association_actions(host, port, user, passwd, parent_p
         "type": "accessrule"
     }
     updated_access_rule = update_access_rule(host, port, access_token,
-                                                             access_rule['id'], access_rule_update, parent_policy_id)
+                                             access_rule['id'], access_rule_update, parent_policy_id)
     if not updated_access_rule:
         print('Unable to update access rule')
-        return
+        return False
     print('Access rule name is {}'.format(updated_access_rule['name']))
+    return True
 
 
 if __name__ == '__main__':
@@ -151,4 +157,7 @@ if __name__ == '__main__':
     user = sys.argv[3]
     passwd = sys.argv[4]
     parent_policy_id = sys.argv[5]
-    timerange_access_rule_association_actions(host, port, user, passwd, parent_policy_id)
+    if timerange_access_rule_association_actions(host, port, user, passwd, parent_policy_id):
+        exit(0)
+    else:
+        exit(1)
