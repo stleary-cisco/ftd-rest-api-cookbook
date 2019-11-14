@@ -21,17 +21,11 @@ from ftd_api_resources.deployment import get_pending_changes, post_deployment, g
 from ftd_api_resources.access_token import get_access_token
 
 def deploy(host, port, user, passwd):
-    '''
-
-    '''
     """
     End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
-    Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values in host, port, user, and passwd in order to connect to your device.
     A deployment will be performed only if the user has made changes on the FTD device and those changes
     are pending at run-time.
-    Forgetting to enter the connection_constants or entering the wrong values, and forgetting to make a pending change
-    on the FTD device are the most common sources of error.
+    Requires Python v3.0 or greater and the reqeusts library.
 
     :param host: ftd host address 
     :param port: ftd host port
@@ -74,7 +68,8 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 5:
-        print("Usage: python cookbook_scripts/deploy.py host port user passwd")
+        print("Perform a deployment operation.")
+        print("Usage: python ftd_api_scripts/deploy.py host port user passwd")
         exit(1)
 
     host = sys.argv[1]

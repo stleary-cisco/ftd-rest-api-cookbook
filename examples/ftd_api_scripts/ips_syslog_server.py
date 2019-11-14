@@ -17,25 +17,26 @@ express or implied.
 '''
 
 import time
-from cookbook_resources.access_token import get_access_token
-from cookbook_resources.ips import get_intrusion_settings, update_intrusion_settings
-from cookbook_resources.syslog_server import post_syslog_server
+from ftd_api_resources.access_token import get_access_token
+from ftd_api_resources.ips import get_intrusion_settings, update_intrusion_settings
+from ftd_api_resources.syslog_server import post_syslog_server
 
 
-def main():
+def ips_syslog_server(host, port, user, passwd):
     """
     End to end example of code that assigns an intrusion rule syslog server.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        print("Unable to obtain an access token.")
+        return False
     syslog_server = {
         "host": "192.168.100.1",
         "useManagementInterface": True,
@@ -46,14 +47,32 @@ def main():
     syslog_server = post_syslog_server(host, port, access_token, syslog_server)
     if not syslog_server:
         print('Unable to post syslog server')
-        return
+        return False
     intrusion_settings = get_intrusion_settings(host, port, access_token)
     intrusion_settings["syslogServer"] =  syslog_server
     intrusion_settings = update_intrusion_settings(host, port, access_token, intrusion_settings)
     if not intrusion_settings:
         print('Unable to update intrusion settings')
-        return
+        return False
+    else:
+        return True
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 6:
+        print("Create a hardcoded syslog server and add it to an intrusion policy.")
+        print('Example of a policy_name, enclosed in quotes becuase it includes spaces: "Connectivity Over Security"')
+        print("Usage: python ftd_api_scripts/ips_syslog_server.py host port user passwd policy_name")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    policy_name = sys.argv[5]
+    if ips_syslog_server(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)

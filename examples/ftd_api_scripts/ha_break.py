@@ -17,68 +17,86 @@ express or implied.
 '''
 
 import time
-from cookbook_resources.access_token import get_access_token
-from cookbook_resources.high_availability import get_ha_status, post_break_ha, get_break_ha
+from ftd_api_resources.access_token import get_access_token
+from ftd_api_resources.high_availability import get_ha_status, post_break_ha, get_break_ha
 
 
-def main():
+def ha_break(host, port, user, passwd):
     """
-    End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
+    End to end example of code that performs an HA break break task to complete.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        print("Unable to obtain an access token.")
+        return False
 
-    (node_state, peer_node_state, config_status) = get_ha_status(host=host, port=port, access_token=access_token)
+    ha_status = get_ha_status(host=host, port=port, access_token=access_token)
+    node_state = ha_status.get('node_state')
+    peer_node_state = ha_status.get('peer_node_state')
+    config_status = ha_status.get('config_status')
     if not node_state or not peer_node_state or not config_status:
         # should never happen
         print('Unable to obtain ha status')
-        return
+        return False
     if node_state == 'HA_CONFIGURATION_SYNC' or peer_node_state == 'HA_CONFIGURATION_SYNC' or \
                     config_status == 'PRIMARY_IMPORTING_CONFIG' or config_status == 'SECONDARY_IMPORTING_CONFIG':
         print('Invalid ha status for break: node {} peer {} configStatus {}'.format(node_state, peer_node_state,
                                                                                     config_status))
-        return
-    break_ha_id = post_break_ha(host=host, port=port, access_token=access_token, clearIntfs=True)
+        return False
+    break_ha_id = post_break_ha(host=host, port=port, access_token=access_token, interface_option='DISABLE_INTERFACES')
     if not break_ha_id:
         print('Unable to obtain break id')
-        return
+        return False
     for _ in range(80):
         state = get_break_ha(host=host, port=port, access_token=access_token, break_ha_id=break_ha_id)
         if state == 'DEPLOYED':
             break
         elif state == 'FAILED':
             print('Unable to complete break deployment')
-            return
+            return False
         else:
             print("sleep 15 seconds")
             time.sleep(15)
     else:
         print('Unable to complete break')
-        return
+        return False
 
     for _ in range(80):
         (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
         if not node_state:
             # should never happen
             print('Unable to obtain ha status')
-            return
+            return False
         if node_state == 'SINGLE_NODE':
             print("HA break completed successfully")
-            return
+            return True
         print("sleep 15 seconds")
         time.sleep(15)
     else:
         print('Unable to complete break')
-        return
+        return False
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 5:
+        print("Send a break request to a device in an HA pair")
+        print("Usage: python ftd_api_scripts/ha_break.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    if ha_break(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)
