@@ -17,30 +17,31 @@ express or implied.
 '''
 
 import time
-from cookbook_resources.access_token import get_access_token
-from cookbook_resources.troubleshoot import schedule_troubleshoot, get_troubleshoot_job, download_troubleshoot
+from ftd_api_resources.access_token import get_access_token
+from ftd_api_resources.troubleshoot import schedule_troubleshoot, get_troubleshoot_job, download_troubleshoot
 
 
-def main():
+def troubleshoot(host, port, user, passwd):
     """
-    End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
+    End to end example of code that creates and downloads a troubleshoot file.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        print("Unable to obtain an access token.")
+        return False
 
     job_id = schedule_troubleshoot(host=host, port=port, access_token=access_token)
     if not job_id:
         # should never happen
         print('Unable to obtain a job id')
-        return
+        return False
     # wait for a reasonable period of time (about 20 minutes) for the job to complete
     status = None
     filename = None
@@ -49,24 +50,40 @@ def main():
         if not status:
             # should never happen
             print('Unable to obtain the troubleshoot job status')
-            return
+            return False
         elif status == 'SUCCESS':
             print('Completed troubleshoot job successfully {}'.format(filename))
             break
         elif status == 'FAILED':
             # should never happen
             print('Troubleshoot job failed')
-            return
+            return False
         print("sleep 15 seconds")
         time.sleep(15)
     else:
         print('Unable to complete the troubleshoot')
-        return
+        return False
     try:
         download_troubleshoot(host=host, port=port, access_token=access_token, filename=filename)
+        return True
     except Exception as e:
         print('Error when downloading troubleshoot file {}'.format(str(e)))
+        return False
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 5:
+        print("Create and download a troubleshoot file.")
+        print("Usage: python ftd_api_scripts/troubleshoot.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    if troubleshoot(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)

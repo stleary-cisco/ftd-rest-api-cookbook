@@ -17,43 +17,57 @@ express or implied.
 '''
 
 import time
-from cookbook_resources.access_token import get_access_token
-from cookbook_resources.high_availability import get_ha_status, suspend_HA
+from ftd_api_resources.access_token import get_access_token
+from ftd_api_resources.high_availability import get_ha_status, suspend_HA
 
 
-def main():
+def ha_suspend(host, port, user, passwd):
     """
     End to end example of code that suspends a device in a HA pair.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
+        print("Unable to obtain an access token.")
+        return False
     result = suspend_HA(host, port, access_token)
     if not result:
         print('Unable to suspend device')
-        return
+        return False
     for _ in range(80):
         (node_state, _, _) = get_ha_status(host=host, port=port, access_token=access_token)
         if not node_state:
             # should never happen
             print('Unable to obtain ha status')
-            return
+            return False
         if node_state == 'HA_SUSPENDED_NODE':
             print("FTD device suspended successfully")
-            return
+            return True
         print("sleep 15 seconds")
         time.sleep(15)
     else:
         print('Never reached suspended state')
-        return
+        return False
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 5:
+        print("Usage: python ftd_api_scripts/ha_suspend.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    if ha_suspend(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)

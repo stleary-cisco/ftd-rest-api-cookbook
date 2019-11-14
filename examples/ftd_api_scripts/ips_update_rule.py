@@ -16,52 +16,75 @@ express or implied.
 
 '''
 
-from cookbook_resources.access_token import get_access_token
-from cookbook_resources.ips import get_intrusion_policy, get_intrusion_rule, update_intrusion_rule
+from ftd_api_resources.access_token import get_access_token
+from ftd_api_resources.ips import get_intrusion_policy, get_intrusion_rule, update_intrusion_rule
 
 
-def main():
+def ips_update_rule(host, port, user, passwd, policy_name, gid, sid, state):
     """
-    End to end example of code that updates an intrusion rule.
+    End to end example of code that updates an intrusion rule for an intrusion policy.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :param policy_name: name of the policy to update
+    :param gid: group id of the rule to update
+    :param sid: signature id of the rule to update
+    :param state: override state of the rule to update
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
-        return
-    intrusion_policy = get_intrusion_policy(host, port, access_token, 'Security%20Over%20Connectivity')
+        print("Unable to obtain an access token.")
+        return False
+    intrusion_policy = get_intrusion_policy(host, port, access_token, policy_name)
     if not intrusion_policy:
         print('Unable to get intrusion policy')
-        return
-    gid = '1'
-    sid = '37244'
+        return False
     intrusion_rule = get_intrusion_rule(host, port, access_token, intrusion_policy['id'], gid, sid)
     if not intrusion_rule:
         print('Unable to get intrusion rule')
-        return
+        return False
     rule_update = {
         'version': intrusion_policy['version'],
         'id': intrusion_policy['id'],
         'ruleConfigs': [{
             'id': intrusion_rule['id'],
-            'state': 'DROP'
+            'state': state
         }],
         'type': 'intrusionpolicyruleupdate'
     }
     result = update_intrusion_rule(host, port, access_token, intrusion_policy['id'], rule_update)
     if not result:
         print('Unable to update intrusion rule')
-        return
+        return False
     intrusion_rule = get_intrusion_rule(host, port, access_token, intrusion_policy['id'], gid, sid)
     if not intrusion_rule:
         print('Unable to get intrusion rule')
-        return
+        return False
     print('rule action is {}'.format(intrusion_rule['overrideState']))
+    return True
+
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 9:
+        print("Update a rule in an intrusion policy.")
+        print("Usage: python ftd_api_scripts/ips_update_rule.py host port user passwd policy_name gid sid state")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    policy_name = sys.argv[5]
+    gid = sys.argv[6]
+    sid = sys.argv[7]
+    state = sys.argv[8]
+    if ips_update_rule(host, port, user, passwd, policy_name, gid, sid, state):
+        exit(0)
+    else:
+        exit(1)

@@ -17,23 +17,24 @@ express or implied.
 '''
 
 import time
-from cookbook_resources.access_token import get_access_token
-from cookbook_resources.high_availability import get_ha_status, resume_HA
+from ftd_api_resources.access_token import get_access_token
+from ftd_api_resources.high_availability import get_ha_status, resume_HA
 
 
-def main():
+def ha_resume(host, port, user, passwd):
     """
     End to end example of code that performs an HA resume and waits for the device to rejoin the HA pair.
     Requires Python v3.0 or greater and the reqeusts library.
-    You must update the values for host, port, user, and password to connect to your device.
+
+    :param host: ftd host address
+    :param port: ftd host port
+    :param user: login username
+    :param passwd: login password
+    :return: True if successful, otherwise False
     """
-    host = 'ftd.example'
-    port = '443'
-    user = 'admin'
-    passwd = 'Admin123'
     access_token = get_access_token(host, port, user, passwd)
     if not access_token:
-        print("Unable to obtain an access token. Did you remember to set host, port, user, and password?")
+        print("Unable to obtain an access token.")
         return
     result = resume_HA(host, port, access_token)
     if not result:
@@ -55,4 +56,17 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) != 5:
+        print("Usage: python ftd_api_scripts/ha_resume.py host port user passwd")
+        exit(1)
+
+    host = sys.argv[1]
+    port = sys.argv[2]
+    user = sys.argv[3]
+    passwd = sys.argv[4]
+    if ha_resume(host, port, user, passwd):
+        exit(0)
+    else:
+        exit(1)
