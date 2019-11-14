@@ -60,6 +60,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 5:
+        print("Send a suspend request to a device in an HA pair")
         print("Usage: python ftd_api_scripts/ha_suspend.py host port user passwd")
         exit(1)
 

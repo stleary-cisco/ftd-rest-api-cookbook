@@ -81,6 +81,8 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 6:
+        print("Create a hardcoded access rule with an intrusion policy")
+        print('Example of a policy_name, enclosed in quotes becuase it includes spaces: "Connectivity over security"')
         print("Usage: python ftd_api_scripts/ips_access_rule.py host port user passwd policy_name")
         exit(1)
 

@@ -59,6 +59,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 5:
+        print("Send a resume request to a device in an HA pair")
         print("Usage: python ftd_api_scripts/ha_resume.py host port user passwd")
         exit(1)
 
