@@ -21,9 +21,6 @@ from ftd_api_resources.deployment import get_pending_changes, post_deployment, g
 from ftd_api_resources.access_token import get_access_token
 
 def deploy(host, port, user, passwd):
-    '''
-
-    '''
     """
     End to end example of code that performs an FTD deployment and waits for the deploy task to complete.
     A deployment will be performed only if the user has made changes on the FTD device and those changes
