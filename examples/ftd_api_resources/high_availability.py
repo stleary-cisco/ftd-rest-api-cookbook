@@ -94,6 +94,31 @@ def resume_HA(host, port, access_token):
         return True
 
 
+def reset_HA(host, port, access_token):
+    """
+    Requires Python v3.0 or greater and requests lib.
+    Send an HA reset POST request to a device in an HA pair.
+    :param host: ftd host address
+    :param port: ftd port
+    :param access_token: OAUTH token for device access
+    :return: True if successful, otherwise False
+    """
+    headers = {
+        "Accept": "application/json",
+        "Authorization": "Bearer {}".format(access_token)
+    }
+    reset_ha_url = 'api/fdm/latest/devices/default/action/ha/reset'
+    response = requests.post('https://{host}:{port}/{url}'.format(host=host, port=port, url=reset_ha_url),
+                             verify=False, headers=headers)
+    if response.status_code != 200:
+        print("Failed POST reset HA response {} {}".format(response.status_code, response.json()))
+        return False
+    else:
+        print('HA reset successfully')
+        return True
+
+
+
 def post_break_ha(host, port, access_token, clearIntfs=False):
     """
     Requires Python v3.0 or greater and requests lib.
