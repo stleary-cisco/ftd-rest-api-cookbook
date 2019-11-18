@@ -43,14 +43,14 @@ def get_smart_agent_connections(host, port, access_token):
     return response.json()["items"]
 
 
-def post_smart_agent_connection(host, port, access_token, smart_license_token):
+def post_smart_agent_connection(host, port, access_token, smart_agent_connection):
     """
     Requires Python v3.0 or greater and requests lib.
     Sends a POST request to start Smart License Registration job
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH access token
-    :param smart_license_token: Smart License key
+    :param smart_agent_connection: object representing  Smart Agent Connection model
     """
     smart_agent_connections_path = "api/fdm/latest/license/smartagentconnections"
     headers = {
@@ -58,22 +58,19 @@ def post_smart_agent_connection(host, port, access_token, smart_license_token):
         "Authorization": "Bearer {}".format(access_token),
         "Content-Type": "application/json"
     }
-    request_body = {
-        "connectionType": "REGISTER",
-        "token": smart_license_token,
-        "type": "smartagentconnection"
-    }
 
     url = "https://{host}:{port}/{url}".format(host=host, port=port, url=smart_agent_connections_path)
     print("Send a POST request to url: {}".format(url))
-    response = requests.post(url, json=request_body, verify=False, headers=headers)
+    response = requests.post(url, data=json.dumps(smart_agent_connection), verify=False, headers=headers)
 
     if response.status_code != 200:
         print("Failed with status {}: {}".format(response.status_code, json.dumps(response.json(), indent=2)))
-        raise Exception("Failed to POST Smart Agent Connection.")
+        raise Exception("Failed to POST Smart Agent Connection: {}".format(json.dumps(smart_agent_connection)))
 
     print(json.dumps(response.json(), indent=2))
     print("Smart License Registration job started successfully.")
+
+    return response.json()
 
 
 def delete_smart_agent_connection(host, port, access_token, obj_id):
@@ -129,13 +126,14 @@ def get_smart_agent_statuses(host, port, access_token):
     return response.json()["items"]
 
 
-def post_smart_agent_sync_requests(host, port, access_token):
+def post_smart_agent_sync_requests(host, port, access_token, smart_agent_sync_request):
     """
     Requires Python v3.0 or greater and requests lib.
     Sends a POST request to sync Smart Agent
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH access token
+    :param smart_agent_sync_request: object representing Smart Agent Sync Request model
     """
     smart_agent_sync_requests_path = "api/fdm/latest/license/smartagentsyncrequests"
     headers = {
@@ -143,18 +141,16 @@ def post_smart_agent_sync_requests(host, port, access_token):
         "Authorization": "Bearer {}".format(access_token),
         "Content-Type": "application/json"
     }
-    request_body = {
-        "sync": True,
-        "type": "smartagentsyncrequest"
-    }
 
     url = "https://{host}:{port}/{url}".format(host=host, port=port, url=smart_agent_sync_requests_path)
     print("Send a POST request to url: {}".format(url))
-    response = requests.post(url, json=request_body, verify=False, headers=headers)
+    response = requests.post(url, data=json.dumps(smart_agent_sync_request), verify=False, headers=headers)
 
     if response.status_code != 200:
         print("Failed with status {}: {}".format(response.status_code, json.dumps(response.json(), indent=2)))
-        raise Exception("Failed to POST Smart Agent sync.")
+        raise Exception("Failed to POST Smart Agent Sync Request: {}".format(json.dumps(smart_agent_sync_request)))
 
     print(json.dumps(response.json(), indent=2))
     print("Smart Agent Sync request is successfully sent.")
+
+    return response.json()

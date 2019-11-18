@@ -22,16 +22,25 @@ from ftd_api_resources.smart_agent import post_smart_agent_sync_requests
 
 def sync(host, port, user, passwd):
     """
-    Example of code that disables license by type name.
+    Example of code that synchronize Smart Agent.
     Preconditions: device is registered in Smart License.
     Requires Python v3.0 or greater and the requests library.
+
+    :param host: ftd host address
+    :param port: ftd port
+    :param user: login user name
+    :param passwd: login password
     """
     access_token = get_access_token(host, port, user, passwd)
 
     if not access_token:
         raise Exception('Unable to obtain an access token.')
 
-    post_smart_agent_sync_requests(host, port, access_token)
+    smart_agent_sync_request = {
+        "sync": True,
+        "type": "smartagentsyncrequest"
+    }
+    post_smart_agent_sync_requests(host, port, access_token, smart_agent_sync_request)
 
 
 if __name__ == '__main__':

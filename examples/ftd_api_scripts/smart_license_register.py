@@ -40,10 +40,15 @@ def register(host, port, user, passwd, token):
     if not access_token:
         raise Exception("Unable to obtain an access token.")
 
-    post_smart_agent_connection(host, port, access_token, token)
+    smart_agent_connection = {
+        "connectionType": "REGISTER",
+        "token": token,
+        "type": "smartagentconnection"
+    }
+    post_smart_agent_connection(host, port, access_token, smart_agent_connection)
 
     status = ""
-    for i in range(0, 15):
+    for _ in range(0, 15):
         print("Waiting 5 seconds to complete Smart License Registration job...")
         time.sleep(5)
         status = get_last_smart_license_registration_job_status(host, port, access_token)
@@ -55,8 +60,11 @@ def register(host, port, user, passwd, token):
     else:
         raise Exception("Smart License Registration job has status: {}. Expected: SUCCESS".format(status))
 
-    assert len(get_smart_agent_connections(host, port, access_token)) == 1
-    assert get_smart_agent_statuses(host, port, access_token)[0]['registrationStatus'] == 'REGISTERED'
+    if len(get_smart_agent_connections(host, port, access_token)) == 0:
+        raise Exception("Smart Agent Connection was was created.")
+
+    if get_smart_agent_statuses(host, port, access_token)[0]['registrationStatus'] != 'REGISTERED':
+        raise Exception("Smart Agent Status is invalid. Expected = 'REGISTERED'.")
 
 
 if __name__ == "__main__":

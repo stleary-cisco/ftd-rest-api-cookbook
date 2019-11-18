@@ -41,7 +41,7 @@ def unregister(host, port, user, passwd):
     delete_smart_agent_connection(host, port, access_token, smart_agent_connections[0]["id"])
 
     status = ""
-    for i in range(0, 15):
+    for _ in range(0, 15):
         print("Waiting 5 seconds to complete Smart License Un-registration job...")
         time.sleep(5)
         status = get_last_smart_license_unregistration_job_status(host, port, access_token)
@@ -53,8 +53,11 @@ def unregister(host, port, user, passwd):
     else:
         raise Exception("Smart License Un-registration job has status: {}. Expected: SUCCESS".format(status))
 
-    assert len(get_smart_agent_connections(host, port, access_token)) == 0
-    assert get_smart_agent_statuses(host, port, access_token)[0]["registrationStatus"] == "UNREGISTERED"
+    if len(get_smart_agent_connections(host, port, access_token)) != 0:
+        raise Exception("Smart Agent Connection was not removed.")
+
+    if get_smart_agent_statuses(host, port, access_token)[0]['registrationStatus'] != 'UNREGISTERED':
+        raise Exception("Smart Agent Status is invalid. Expected = 'UNREGISTERED'.")
 
 
 if __name__ == "__main__":

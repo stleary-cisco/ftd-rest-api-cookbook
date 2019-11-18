@@ -1,4 +1,4 @@
-'''
+"""
 Copyright (c) 2019 Cisco and/or its affiliates.
 
 This software is licensed to you under the terms of the Cisco Sample
@@ -14,7 +14,7 @@ writing, software distributed under the License is distributed on an
 "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied.
 
-'''
+"""
 
 from ftd_api_resources.access_token import get_access_token
 from ftd_api_resources.smart_license import get_license_by_type, delete_license
@@ -25,6 +25,12 @@ def disable_license(host, port, user, passwd, license_type):
     Example of code that disables license by type name.
     Preconditions: device is registered in Smart License.
     Requires Python v3.0 or greater and the requests library.
+
+    :param host: ftd host address
+    :param port: ftd port
+    :param user: login user name
+    :param passwd: login password
+    :param smart_license_type: Smart License types (e.g. APEX)
     """
     access_token = get_access_token(host, port, user, passwd)
 
