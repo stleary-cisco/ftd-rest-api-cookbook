@@ -27,6 +27,7 @@ from ftd_api_resources.smart_license_job import get_last_smart_license_registrat
 def register(host, port, user, passwd, token):
     """
     Example of code that performs registration in Smart License and waits for registration job completion.
+    You could generate a ``token`` on your Cisco Smart Software Manager account page (https://software.cisco.com/#SmartLicensing-Inventory).
     Requires Python v3.0 or greater and the requests library.
 
     :param host: ftd host address

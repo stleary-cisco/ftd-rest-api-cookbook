@@ -24,6 +24,14 @@ def disable_license(host, port, user, passwd, license_type):
     """
     Example of code that disables license by type name.
     Preconditions: device is registered in Smart License.
+
+    ``smart_license_type`` parameter accepts the following values:
+        ``BASE`` - perpetual license is included with the purchase of the system;
+        ``THREAT`` - allows you to perform intrusion detection and prevention and file control;
+        ``MALWARE`` - allows you to perform Cisco Advanced Malware Protection (AMP);
+        ``URLFILTERING`` - allows you to control web access based on URL categories and reputations;
+        ``PLUS``, ``APEX`` or ``VPNOnly`` - RA VPN license types.
+
     Requires Python v3.0 or greater and the requests library.
 
     :param host: ftd host address

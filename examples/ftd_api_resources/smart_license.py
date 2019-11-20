@@ -102,6 +102,14 @@ def delete_license(host, port, access_token, smart_license_id):
 def get_license_by_type(host, port, access_token, smart_license_type):
     """
     Returns license from server by type
+
+    ``smart_license_type`` parameter accepts the following values:
+        ``BASE`` - perpetual license is included with the purchase of the system;
+        ``THREAT`` - allows you to perform intrusion detection and prevention and file control;
+        ``MALWARE`` - allows you to perform Cisco Advanced Malware Protection (AMP);
+        ``URLFILTERING`` - allows you to control web access based on URL categories and reputations;
+        ``PLUS``, ``APEX`` or ``VPNOnly`` - RA VPN license types.
+
     :param host: ftd host address
     :param port: ftd port
     :param access_token: OAUTH access token

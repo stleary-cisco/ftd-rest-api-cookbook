@@ -24,13 +24,21 @@ def enable_license(host, port, user, passwd, smart_license_type):
     """
     Example of code that enables license by type name.
     Preconditions: device is registered in Smart License.
+
+    ``smart_license_type`` parameter accepts the following values:
+        ``BASE`` - perpetual license is included with the purchase of the system;
+        ``THREAT`` - allows you to perform intrusion detection and prevention and file control;
+        ``MALWARE`` - allows you to perform Cisco Advanced Malware Protection (AMP);
+        ``URLFILTERING`` - allows you to control web access based on URL categories and reputations;
+        ``PLUS``, ``APEX`` or ``VPNOnly`` - RA VPN license types.
+
     Requires Python v3.0 or greater and the requests library.
 
     :param host: ftd host address
     :param port: ftd port
     :param user: login user name
     :param passwd: login password
-    :param smart_license_type: Smart License types (e.g. APEX)
+    :param smart_license_type: Smart License type (e.g. APEX)
     """
     access_token = get_access_token(host, port, user, passwd)
 
