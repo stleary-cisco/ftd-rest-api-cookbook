@@ -48,9 +48,10 @@ def register(host, port, user, passwd, token):
     post_smart_agent_connection(host, port, access_token, smart_agent_connection)
 
     status = ""
-    for _ in range(0, 15):
-        print("Waiting 5 seconds to complete Smart License Registration job...")
-        time.sleep(5)
+    # wait for a reasonable period of time (about 20 minutes) for job to complete
+    for _ in range(0, 60):
+        print("Waiting 10 seconds to complete Smart License Registration job...")
+        time.sleep(10)
         status = get_last_smart_license_registration_job_status(host, port, access_token)
         if status != "IN_PROGRESS":
             break
